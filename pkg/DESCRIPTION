@@ -10,5 +10,5 @@ Description: Graphical and computational methods that can be used to assess the 
   recursive partitioning methods) are provided.
 Depends: R (>= 3.0.0), partykit (>= 1.0-4)
 Imports: graphics
-Suggests: utils
+Suggests: utils, Formula
 License: GPL-2 | GPL-3
