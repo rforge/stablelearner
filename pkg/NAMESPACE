@@ -1,0 +1,21 @@
+import("partykit", "graphics")
+
+importFrom("parallel",
+  "mclapply"
+)
+
+export(
+  "stabletree",
+
+  "bootstrap",
+  "subsampling",
+  "crossvalidation",
+  "jackknife"
+)
+
+S3method("barplot", "stabletree")
+S3method("image", "stabletree")
+S3method("plot", "stabletree")
+S3method("print", "stabletree")
+S3method("summary", "stabletree")
+S3method("print", "summary.stabletree")
