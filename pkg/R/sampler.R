@@ -1,4 +1,4 @@
-bootstrap <- bootstrap <- function(B = 500) {
+bootstrap <- function(B = 500) {
   sampfun <- function(n) replicate(B, sample(1L:n, n, replace = TRUE))
   list(method = "Bootstrap sampling", sampler = sampfun)
 }

@@ -47,7 +47,7 @@ stabletree <- function(x, data = NULL, sampler = bootstrap,
   ## extract names of all variables and omit response (FIXME: currently assuming a
   ## single response)
   nm <- all.vars(terms(x))
-  cl <- sapply(data[, nm], function(x) class(x)[1])
+  cl <- sapply(data[, nm], function(x) class(x)[1L])
   yi <- attr(terms(x), "response")
   nm <- nm[-yi]
   
@@ -191,7 +191,8 @@ stabletree <- function(x, data = NULL, sampler = bootstrap,
 
 ### -- simple standard methods -------------------------------------------------
 
-print.stabletree <- function(x, ...) {
+print.stabletree <- function(x, ...)
+{
   cat("\nCall:\n")
   print(x$call)
   cat("\nSampler:\n")
@@ -200,7 +201,8 @@ print.stabletree <- function(x, ...) {
   cat("\n")
 }
 
-summary.stabletree <- function(object, show.breaks = FALSE, digits = 3, ...) {
+summary.stabletree <- function(object, show.breaks = FALSE, digits = 3, ...)
+{
   ans <- list()
   ans$B <- object$B
   ans$call <- object$call
@@ -241,7 +243,8 @@ summary.stabletree <- function(object, show.breaks = FALSE, digits = 3, ...) {
   ans
 }
 
-print.summary.stabletree <- function(x, ...) {
+print.summary.stabletree <- function(x, ...)
+{
   cat("\nCall:\n")
   print(x$call)
   cat("\nSampler:\n")
@@ -313,7 +316,7 @@ barplot.stabletree <- function(height, main = "Variable selection frequencies",
 }
 
 image.stabletree <- function(x, main = "Variable selections",
-  ylab = "Repetitions", xlab = "", col = grey.colors(2),
+  ylab = "Repetitions", xlab = "", col = gray.colors(2),
   names.arg = NULL, names.uline = TRUE, names.diag = TRUE, 
   cex.names = 0.9, xaxs = "i", yaxs = "i",
   xlim = c(0, length(x$vs0)), ylim = c(0, x$B), ...)
@@ -358,8 +361,8 @@ image.stabletree <- function(x, main = "Variable selections",
 plot.stabletree <- function(x, select = order(colMeans(x$vs), decreasing = TRUE), 
   type.breaks = "levels", col.breaks = "red", lty.breaks = "dashed", cex.breaks = 0.7, 
   col.main = c("black", "gray50"), main.uline = TRUE, args.numeric = NULL, args.factor = NULL, 
-  args.ordered = NULL, ...) {
-  
+  args.ordered = NULL, ...)
+{
   br <- x$br
   cl <- x$classes
   if (is.character(select)) 
@@ -399,7 +402,8 @@ plot.stabletree <- function(x, select = order(colMeans(x$vs), decreasing = TRUE)
 
 ### -- graphical auxiliary functions -------------------------------------------
 
-format_labels <- function(n, uline = FALSE, bold = FALSE) {
+format_labels <- function(n, uline = FALSE, bold = FALSE)
+{
   n <- paste0(n, "[]")
   if (bold) 
     n <- paste0("bold(", n, ")")
@@ -408,7 +412,8 @@ format_labels <- function(n, uline = FALSE, bold = FALSE) {
   return(parse(text = n))
 }
 
-ordermat <- function(x, order.rows = TRUE, order.cols = TRUE) {
+ordermat <- function(x, order.rows = TRUE, order.cols = TRUE)
+{
   if (order.cols) {
     colind <- order(colMeans(x, na.rm = TRUE), decreasing = TRUE)
   } else colind <- 1:ncol(x)

@@ -1,12 +1,26 @@
 import("partykit", "graphics")
 
+importFrom("grDevices",
+  "gray.colors",
+  "n2mfrow"
+)
+
+importFrom("stats",
+  "getCall",
+  "na.omit",
+  "terms",
+  "update"
+)
+
 importFrom("parallel",
   "mclapply"
 )
 
 export(
+  ## stability assessment
   "stabletree",
 
+  ## sampler convenience functions
   "bootstrap",
   "subsampling",
   "crossvalidation",
