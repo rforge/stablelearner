@@ -14,28 +14,28 @@
 \format{
 A data frame containing 2207 observations on 11 variables.
 \describe{
-  \item{name}{.} a character with the persons full name.
-  \item{gender}{.} a factor with levels \code{male} and \code{female}.
-  \item{age}{.} a numeric value with the age of the person on the day of the 
+  \item{name}{a character with the persons full name.}
+  \item{gender}{a factor with levels \code{male} and \code{female}.} 
+  \item{age}{a numeric value with the age of the person on the day of the 
   sinking. The age of babies (under 12 months) is given as a fraction of one 
-  year (1/month).
-  \item{class}{.} a factor with the class for passengers (\code{1st}, 
+  year (1/month).} 
+  \item{class}{a factor with the class for passengers (\code{1st}, 
   \code{2nd}, \code{3rd}) and the type of service aboard for crew members 
   (\code{deck crew}, \code{engineering crew}, \code{restaurant staff}, 
-  \code{victualling crew}).
-  \item{embarked}{.} a factor with the place of of embarkment 
-  (\code{Belfast}, \code{Cherbourg}, \code{Queenstown}, \code{Southampton}).
-  \item{country}{.} a factor with the persons home country.
-  \item{ticketno}{.} a numeric value specifying the ticket number 
-  (\code{NA} for crew members).
-  \item{fare}{.} a numeric value with the ticket price (\code{NA} for crew 
-  members, musicians and employees of the shipyard company).
-  \item{sibsp}{.} an ordered factor specifying the number if siblings/spouses 
-  aboard (adopted from Vanderbild data set).
-  \item{parch}{.} an ordered factor specifying the number if parents/children 
-  aboard (adopted from Vanderbild data set).
-  \item{survived}{.} a factor with two levels (\code{no}, \code{yes}) 
-  specifying whether the person has survived the sinking.
+  \code{victualling crew}).}
+  \item{embarked}{a factor with the place of of embarkment 
+  (\code{Belfast}, \code{Cherbourg}, \code{Queenstown}, \code{Southampton}).}
+  \item{country}{a factor with the persons home country.}
+  \item{ticketno}{a numeric value specifying the ticket number 
+  (\code{NA} for crew members).}
+  \item{fare}{a numeric value with the ticket price (\code{NA} for crew 
+  members, musicians and employees of the shipyard company).}
+  \item{sibsp}{an ordered factor specifying the number if siblings/spouses 
+  aboard (adopted from Vanderbild data set).}
+  \item{parch}{an ordered factor specifying the number if parents/children 
+  aboard (adopted from Vanderbild data set).}
+  \item{survived}{a factor with two levels (\code{no}, \code{yes}) 
+  specifying whether the person has survived the sinking.}
 }
 }
 
@@ -45,7 +45,7 @@ The website \url{http://www.encyclopedia-titanica.org/} offers detailed
 information about passengers and crew members on the RMS Titanic. According to
 the website $1317$ passengers and $890$ crew member were abord.
 
-$8$ musicians and $9$ employees of the shipyard company are listed as 
+8 musicians and 9 employees of the shipyard company are listed as 
 passengers, but travelled with a free ticket, which is why they have \code{NA}
 values in \code{fare}. A few regular passengers also have missing values.
 
@@ -55,12 +55,12 @@ values in \code{fare}. A few regular passengers also have missing values.
   The complete list of persons on the RMS titanic was downloaded from 
   \url{http://www.encyclopedia-titanica.org/} on April 5th, 2016. The 
   information given in \code{sibsp} and \code{parch} was adopoted from a data
-  set obtained from \urk{http://biostat.mc.vanderbilt.edu/DataSets}.
+  set obtained from \url{http://biostat.mc.vanderbilt.edu/DataSets}.
 }
 
 \references{
   \url{http://www.encyclopedia-titanica.org/} and 
-  \urk{http://biostat.mc.vanderbilt.edu/DataSets}.
+  \url{http://biostat.mc.vanderbilt.edu/DataSets}.
 }
 
 \examples{
