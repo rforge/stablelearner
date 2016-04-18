@@ -264,7 +264,7 @@ print.summary.stabletree <- function(x, ...)
 barplot.stabletree <- function(height, main = "Variable selection frequencies",
   xlab = "", ylab = "", horiz = FALSE, col = gray.colors(2),
   names.arg = NULL, names.uline = TRUE, names.diag = TRUE,
-  cex.names = 0.9, line = 0.5,
+  cex.names = 0.9, 
   ylim = if (horiz) NULL else c(0, 100), xlim = if (horiz) c(0, 100) else NULL, ...)
 {  
   vsp <- colMeans(height$vs)
@@ -471,9 +471,10 @@ breaks_hist <- function(bri, br0 = NULL, tx0 = NULL, B = NULL, breaks = "Sturges
   
 }
 
-breaks_image <- function(bri, br0 = NULL, tx0 = NULL, B = NULL, ylab = "Replicates", 
+breaks_image <- function(bri, br0 = NULL, tx0 = NULL, B = NULL, ylab = "Repetitions", 
   xlab = "", col = c("#97BDE1", "#ECD1A5"), col.na = "#E6E6E6", col.breaks = "red", 
-  lty.breaks = "dashed", cex.breaks = 0.7, ...)
+  lty.breaks = "dashed", cex.breaks = 0.7, xaxs = "i", yaxs = "i", 
+  xlim = c(0, ncol(bri)), ylim = c(0, max(B, nrow(bri))), ...)
 {
   
   z <- ordermat(bri, order.rows = TRUE, order.cols = FALSE)$x
@@ -483,11 +484,19 @@ breaks_image <- function(bri, br0 = NULL, tx0 = NULL, B = NULL, ylab = "Replicat
   nr <- nrow(bri)
   nc <- ncol(bri)
   
-  if (any(z == 0L)) 
-    col <- c(col.na, col)
+  col <- c(col.na, col)
+
+  plot(xlim, ylim, xlim = xlim, ylim = ylim, type = "n", axes = FALSE, 
+       xaxs = xaxs, yaxs = yaxs, xlab = xlab, ylab = ylab, ...)
   
-  image(x = seq(nc), y = seq(0, nr), z = t(z), axes = FALSE, ylim = c(0, max(B, 
-    nr)), col = col, ylab = ylab, xlab = xlab)
+  sapply(1:nc, function(j) {
+    r <- rle(z[, j])
+    y <- c(0, cumsum(r$lengths), B)
+    sapply(2:length(y), function(k) rect(j - 1, y[k - 1], j, y[k], col = col[r$values[k - 1] + 1], border = NA))
+  })
+  
+#   image(x = seq(nc), y = seq(0, nr), z = t(z), axes = FALSE, ylim = c(0, max(B, 
+#     nr)), col = col, ylab = ylab, xlab = xlab)
   
   grid(nx = nc, ny = NA, col = "#4D4D4D", lty = "solid")
   axis(1, at = seq(nc), labels = colnames(bri), lwd = 0, lwd.ticks = 1)

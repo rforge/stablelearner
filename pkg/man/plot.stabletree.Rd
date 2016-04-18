@@ -19,7 +19,7 @@
 \method{barplot}{stabletree}(height, main = "Variable selection frequencies",
   xlab = "", ylab = "", horiz = FALSE, col = gray.colors(2),
   names.arg = NULL, names.uline = TRUE, names.diag = TRUE,
-  cex.names = 0.9, line = 0.5,
+  cex.names = 0.9, 
   ylim = if (horiz) NULL else c(0, 100), xlim = if (horiz) c(0, 100) else NULL,
   \dots)
 
@@ -32,29 +32,71 @@
 
 \arguments{
   \item{x, height}{an object of class \code{\link{stabletree}}.}
-  \item{select}{integer or character.}
-  \item{type.breaks}{.}
-  \item{col.breaks}{.}
-  \item{lty.breaks}{.}
-  \item{cex.breaks}{.}
-  \item{col.main}{.}
-  \item{main.uline}{.}
-  \item{args.numeric}{.}
-  \item{args.factor}{.}
-  \item{args.ordered}{.}
+  \item{select}{An vector of integer or character values representing the 
+  number(s) or the name(s) of the variable(s) to be plotted. By default all 
+  variables are plotted. The numbers correspond to the ordering of all 
+  partitioning variables used in the call of the fitted model object that was 
+  passed to \code{\link{stabletree}}.}
+  \item{type.breaks}{A character specifying the type of information added to 
+  the lines that represent the splits in the complete data tree. 
+  \code{type.breaks = "levels"} adds the level of the splits.
+  \code{type.breaks = "nodeids"} adds the nodeid of the splits.
+  \code{type.breaks = "breaks"} adds the cutpoint of the splits.
+  \code{type.breaks = "none"} suppresses any labelling.}
+  \item{col.breaks}{Coloring of the lines and the texts that represent the 
+  splits in the complete data tree.}
+  \item{lty.breaks}{Type of the lines that represent the splits in the complete 
+  data tree.}
+  \item{cex.breaks}{Size of the texts that represent the splits in the complete 
+  data tree.}
+  \item{col.main}{A vector of colors of length two. The first color is used for 
+  titles of variables that are selected in the complete data tree. The second 
+  color is used for titles of variables that are not selected in the complete 
+  data tree.}
+  \item{main.uline}{A logical value. If \code{TRUE}, variables selected in the 
+  complete data tree are underlined. If \code{FALSE}, underlining is 
+  surpressed.}
+  \item{args.numeric}{A list of arguments passed to the internal function 
+  that is used for plotting a histogram of the cutpoints in numerical splits.
+  \code{breaks} is passed to \code{hist} (see \code{\link{hist}} for details). 
+  Further arguments in the list are passed to \code{\link{plot.histogram}} such 
+  as \code{col}, \code{border} etc.}
+  \item{args.factor}{A list of arguments passed to the internal function that 
+  is used for plotting an image plot of the cutpoints in categorical splits.
+  \code{col} (a vector of two colors) is used to illustrate 
+  categorical splits. Please note that the default colors are optimized for 
+  color vision deficiency. \code{col.na} defines the color used to highlight 
+  missing categories. Further arguments in the list are passed to the function 
+  \code{\link{plot.default}}.}
+  \item{args.ordered}{A list of arguments passed to the internal function that 
+  is used for plotting a barplot of the cutpoints in ordered categorical splits. 
+  All arguments in the list are passed to the function 
+  \code{\link{barplot.default}}, such as \code{col}, \code{border} etc.}
   \item{\dots}{further arguments passed to plotting functions,
     especially for labeling and annotation.}
   \item{main, xlab, ylab}{character. Annotations of axes and main
     title, respectively.}
-  \item{horiz}{.}
-  \item{col}{.}
-  \item{names.arg}{.}
-  \item{names.uline}{.}
-  \item{names.diag}{.}
-  \item{cex.names}{.}
-  \item{line}{.}
-  \item{xlim, ylim}{.}
-  \item{xaxs, yaxs}{.}
+  \item{horiz}{A logical value. If \code{FALSE}, the bars are drawn vertically 
+  with the first bar to the left. If \code{TRUE}, bars are drawn horizontally 
+  with the first at the bottom.}
+  \item{col}{A vector of colors of length two used for coloring in
+  \code{\link[barplot.stabletree]{barplot}} and 
+  \code{\link[image.stabletree]{image}}. The first color represents selected 
+  and the second color represents not selected partitioning variables.}
+  \item{names.arg}{A vector of labels to be plotted below each bar (in case of 
+  \code{\link[barplot.stabletree]{barplot}}) or each column (in case of
+  \code{\link[image.stabletree]{image}}). If the argument is omitted, then 
+  the variable names are taken as labels.}
+  \item{names.uline}{A logical value. If \code{TRUE}, the labels representing 
+  variables that are used for splitting in the complete data tree, are 
+  underlined. If \code{FALSE}, labels are not underlined.}
+  \item{names.diag}{A logical value (omitted if \code{horiz = TRUE}). If 
+  \code{TRUE}, the labels are drawn diagonally. If \code{FALSE}, labels are 
+  drawn horizontally.}
+  \item{cex.names}{Expansion factor for labels.}
+  \item{xlim, ylim}{The limits of the plot.}
+  \item{xaxs, yaxs}{The style of axis interval calculation to be used (see 
+  \code{\link{par}} for details).}
 }
 
 \details{
