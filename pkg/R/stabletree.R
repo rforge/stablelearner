@@ -250,9 +250,9 @@ print.summary.stabletree <- function(x, ...)
   cat("\nSampler:\n")
   cat("B =", x$B, "\n")
   cat("Method =", x$method)
-  cat("\n\nVariable Selection Overview:\n\n")
+  cat("\n\nVariable selection overview:\n\n")
   print(x$vstab)
-  cat("(* = complete data result)\n")
+  cat("(* = complete data tree)\n")
   if (!is.null(x$br)) {
     cat("\n\n")
     print(x$br)
@@ -262,7 +262,7 @@ print.summary.stabletree <- function(x, ...)
 ### -- graphical methods -------------------------------------------------------
 
 barplot.stabletree <- function(height, main = "Variable selection frequencies",
-  xlab = "", ylab = "", horiz = FALSE, col = gray.colors(2),
+  xlab = "", ylab = "Relative frequency (in %)", horiz = FALSE, col = gray.colors(2),
   names.arg = NULL, names.uline = TRUE, names.diag = TRUE,
   cex.names = 0.9, 
   ylim = if (horiz) NULL else c(0, 100), xlim = if (horiz) c(0, 100) else NULL, ...)
@@ -319,6 +319,7 @@ image.stabletree <- function(x, main = "Variable selections",
   ylab = "Repetitions", xlab = "", col = gray.colors(2),
   names.arg = NULL, names.uline = TRUE, names.diag = TRUE, 
   cex.names = 0.9, xaxs = "i", yaxs = "i",
+  col.tree = 2, lty.tree = 2,
   xlim = c(0, length(x$vs0)), ylim = c(0, x$B), ...)
 {
   ord <- ordermat(x$vs)
@@ -356,12 +357,22 @@ image.stabletree <- function(x, main = "Variable selections",
       ...)
   }
   
+  if (!is.null(x$vs0)) {
+    vs <- ord$x
+    rownames(vs) <- apply(vs, 1, paste, collapse = "-")
+    vs0 <- paste(x$vs0[ord$colind], collapse = "-")
+    eq <- rownames(vs) %in% vs0 + 0L
+    yy <- which(abs(diff(c(0, eq, 0))) > 0) - 1
+    abline(h = yy, col = col.tree, lty = lty.tree)
+    axis(4, at = yy, labels = NA, col = col.tree, lwd = 1, line = 0.2)
+  }
+
 }
 
 plot.stabletree <- function(x, select = order(colMeans(x$vs), decreasing = TRUE), 
   type.breaks = "levels", col.breaks = "red", lty.breaks = "dashed", cex.breaks = 0.7, 
   col.main = c("black", "gray50"), main.uline = TRUE, args.numeric = NULL, args.factor = NULL, 
-  args.ordered = NULL, ...)
+  args.ordered = NULL, main = NULL, ...)
 {
   br <- x$br
   cl <- x$classes
@@ -384,9 +395,9 @@ plot.stabletree <- function(x, select = order(colMeans(x$vs), decreasing = TRUE)
       switch(cl[i],
         "numeric" = do.call("breaks_hist", c(args, args.numeric)), 
         "integer" = do.call("breaks_hist", c(args, args.numeric)),
-	"factor" = do.call("breaks_image", c(args, args.factor)),
-	"ordered" = do.call("breaks_barplot", c(args, args.ordered)),
-	NULL
+      	"factor" = do.call("breaks_image", c(args, args.factor)),
+	      "ordered" = do.call("breaks_barplot", c(args, args.ordered)),
+      	NULL
       )
       abline(h = x$B, col = "black", lty = "dotted")
     } else {
@@ -394,8 +405,12 @@ plot.stabletree <- function(x, select = order(colMeans(x$vs), decreasing = TRUE)
       plot(0, 0, axes = FALSE, type = "n", xlab = "", ylab = "")
       text(0, 0, labels = "nothing to plot")
     }
-    title(main = format_labels(names(br)[i], uline = if (main.uline) 
-      x$vs0[i] else 0, bold = TRUE), col.main = col.main[2L - x$vs0[i]], ...)
+    t_i <- if(is.null(main)) names(br)[i] else main[i]
+    if(nchar(t_i)>0) {
+      title(main = format_labels(t_i,
+        uline = if (main.uline) x$vs0[i] else 0, bold = TRUE), 
+        col.main = col.main[2L - x$vs0[i]], ...)
+    }
   }
   par(mfrow = c(1, 1))
 }
@@ -499,7 +514,7 @@ breaks_image <- function(bri, br0 = NULL, tx0 = NULL, B = NULL, ylab = "Repetiti
 #     nr)), col = col, ylab = ylab, xlab = xlab)
   
   grid(nx = nc, ny = NA, col = "#4D4D4D", lty = "solid")
-  axis(1, at = seq(nc), labels = colnames(bri), lwd = 0, lwd.ticks = 1)
+  axis(1, at = seq(nc) - 0.5, labels = colnames(bri), lwd = 0, lwd.ticks = 1)
   axis(2)
   
   if (!is.null(br0)) {
@@ -511,7 +526,6 @@ breaks_image <- function(bri, br0 = NULL, tx0 = NULL, B = NULL, ylab = "Repetiti
     sapply(seq(nrow(br0)), function(i) {
       eq <- rownames(z) %in% rownames(br0)[i] + 0L
       yy <- which(abs(diff(c(0, eq, 0))) > 0) - 1
-      xx <- rep(nc + 0.5, length(yy))
       abline(h = yy, col = col.breaks, lty = lty.breaks)
       axis(4, at = yy, labels = NA, col = col.breaks, lwd = 1, line = 0.2, 
         cex = cex.breaks)
