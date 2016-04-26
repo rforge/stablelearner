@@ -14,7 +14,8 @@
 \method{plot}{stabletree}(x, select = order(colMeans(x$vs), decreasing = TRUE), 
   type.breaks = "levels", col.breaks = "red", lty.breaks = "dashed",
   cex.breaks = 0.7,  col.main = c("black", "gray50"), main.uline = TRUE,
-  args.numeric = NULL, args.factor = NULL, args.ordered = NULL, \dots)
+  args.numeric = NULL, args.factor = NULL, args.ordered = NULL, main = NULL,
+  \dots)
 
 \method{barplot}{stabletree}(height, main = "Variable selection frequencies",
   xlab = "", ylab = "", horiz = FALSE, col = gray.colors(2),
@@ -27,7 +28,8 @@
   ylab = "Repetitions", xlab = "", col = gray.colors(2),
   names.arg = NULL, names.uline = TRUE, names.diag = TRUE, 
   cex.names = 0.9, xaxs = "i", yaxs = "i",
-  xlim = c(0, length(x$vs0)), ylim = c(0, x$B), \dots)
+  col.tree = 2, lty.tree = 2, xlim = c(0, length(x$vs0)), ylim = c(0, x$B),
+  \dots)
 }
 
 \arguments{
@@ -94,7 +96,8 @@
   \item{cex.names}{Expansion factor for labels.}
   \item{xlim, ylim}{The limits of the plot.}
   \item{xaxs, yaxs}{The style of axis interval calculation to be used (see 
-  \code{\link{par}} for details).}
+    \code{\link{par}} for details).}
+  \item{col.tree, lty.tree}{FIXME}
 }
 
 \details{
