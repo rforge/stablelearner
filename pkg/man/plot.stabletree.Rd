@@ -79,13 +79,11 @@
   \item{horiz}{A logical value. If \code{FALSE}, the bars are drawn vertically 
   with the first bar to the left. If \code{TRUE}, bars are drawn horizontally 
   with the first at the bottom.}
-  \item{col}{A vector of colors of length two used for coloring in
-  \code{\link[barplot.stabletree]{barplot}} and 
-  \code{\link[image.stabletree]{image}}. The first color represents selected 
+  \item{col}{A vector of colors of length two used for coloring in the
+  \code{barplot} and \code{image} methods. The first color represents selected 
   and the second color represents not selected partitioning variables.}
   \item{names.arg}{A vector of labels to be plotted below each bar (in case of 
-  \code{\link[barplot.stabletree]{barplot}}) or each column (in case of
-  \code{\link[image.stabletree]{image}}). If the argument is omitted, then 
+  \code{barplot}) or each column (in case of \code{image}). If the argument is omitted, then 
   the variable names are taken as labels.}
   \item{names.uline}{A logical value. If \code{TRUE}, the labels representing 
   variables that are used for splitting in the complete data tree, are 
