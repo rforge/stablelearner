@@ -46,9 +46,7 @@ stabletree <- function(x, data = NULL, sampler = bootstrap,
   
   ## extract names of all variables and omit response (FIXME: currently assuming a
   ## single response)
-  gc <- getCall(x)
-  mf <- model.frame(x, data = eval(gc$data), subset = eval(gc$subset), 
-                    na.action = NULL, drop.unused.levels = TRUE)
+  mf <- droplevels(model.frame(x, data = data))
   tr <- terms(x)
   cl <- attr(tr, "dataClasses")
   yi <- attr(tr, "response")
