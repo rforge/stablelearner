@@ -17,7 +17,7 @@ stabletree <- function(x, data = NULL, sampler = bootstrap,
   }
   
   ## data extraction
-  if (is.null(data)) 
+  if (is.null(data))
     data <- eval(getCall(x)$data)  #FIXME# more elegant default?
   n <- nrow(data)
   
@@ -33,7 +33,7 @@ stabletree <- function(x, data = NULL, sampler = bootstrap,
       function(X, FUN) parallel::mclapply(X, FUN, mc.cores = cores)
     }
   }
-  
+
   ## bootstrap trees (and omit data copy from tree)
   xx <- applyfun(1L:B, function(i) {
     datai <- data[na.omit(bix[, i]), , drop = FALSE]
@@ -46,11 +46,15 @@ stabletree <- function(x, data = NULL, sampler = bootstrap,
   
   ## extract names of all variables and omit response (FIXME: currently assuming a
   ## single response)
-  nm <- all.vars(terms(x))
-  cl <- attr(terms(x), "dataClasses")
-  yi <- attr(terms(x), "response")
+  gc <- getCall(x)
+  mf <- model.frame(x, data = eval(gc$data), subset = eval(gc$subset), 
+                    na.action = NULL, drop.unused.levels = TRUE)
+  tr <- terms(x)
+  cl <- attr(tr, "dataClasses")
+  yi <- attr(tr, "response")
+  nm <- names(cl)
   nm <- nm[-yi]
-  
+
   ## convert original tree to party (if necessary)
   if (!inherits(x, "party")) 
     x <- as.party(x)
@@ -92,7 +96,7 @@ stabletree <- function(x, data = NULL, sampler = bootstrap,
           ans <- do.call("rbind", ids)
           if (!is.null(ans)) {
           rownames(ans) <- NULL
-          colnames(ans) <- levels(data[, n])
+          colnames(ans) <- levels(mf[, n])
           }
         } else {
           ans <- unlist(brs)
@@ -112,7 +116,7 @@ stabletree <- function(x, data = NULL, sampler = bootstrap,
       br <- x[[n]]
       if (!is.null(br)) {
         if (cl[n] == "ordered") 
-          br <- ordered(br, levels = 1L:nlevels(data[, n]), labels = levels(data[, 
+          br <- ordered(br, levels = 1L:nlevels(mf[, n]), labels = levels(mf[, 
           n]))
         br
       } else NULL
@@ -383,7 +387,8 @@ plot.stabletree <- function(x, select = order(colMeans(x$vs), decreasing = TRUE)
     message("Nothing to plot!")
     return(invisible(NULL))
   } else {
-    par(mfrow = n2mfrow(nplt))
+    if(nplt>1L)
+      par(mfrow = n2mfrow(nplt))
   }
   for (i in select) {
     if (sum(x$vs[, i]) > 0L) {
@@ -412,7 +417,8 @@ plot.stabletree <- function(x, select = order(colMeans(x$vs), decreasing = TRUE)
         col.main = col.main[2L - x$vs0[i]], ...)
     }
   }
-  par(mfrow = c(1, 1))
+  if(nplt>1L)
+    par(mfrow = c(1, 1))
 }
 
 ### -- graphical auxiliary functions -------------------------------------------
@@ -465,11 +471,16 @@ breaks_barplot <- function(bri, br0 = NULL, tx0 = NULL, B = NULL,
 
 breaks_hist <- function(bri, br0 = NULL, tx0 = NULL, B = NULL, breaks = "Sturges", 
   col = "#E6E6E6", ylab = "Counts", xlab = "", col.breaks = "red", lty.breaks = "dashed", 
-  cex.breaks = 0.7, ...)
+  cex.breaks = 0.7, log = "", ...)
 {
   
   if (length(bri) < 1L) 
     bri <- 0
+
+  if(log=="x") {
+    bri <- log(bri)
+    br0 <- log(br0)
+  }
   
   h <- hist.default(bri, breaks = breaks, plot = FALSE)  
   plot(h, main = "", ylab = ylab, xlab = xlab, col = col,
@@ -514,7 +525,7 @@ breaks_image <- function(bri, br0 = NULL, tx0 = NULL, B = NULL, ylab = "Repetiti
 #     nr)), col = col, ylab = ylab, xlab = xlab)
   
   grid(nx = nc, ny = NA, col = "#4D4D4D", lty = "solid")
-  axis(1, at = seq(nc), labels = colnames(bri), lwd = 0, lwd.ticks = 1)
+  axis(1, at = seq(nc) - 0.5, labels = colnames(bri), lwd = 0, lwd.ticks = 1)
   axis(2)
   
   if (!is.null(br0)) {
