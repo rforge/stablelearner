@@ -47,7 +47,7 @@ stabletree <- function(x, data = NULL, sampler = bootstrap,
   ## extract names of all variables and omit response (FIXME: currently assuming a
   ## single response)
   nm <- all.vars(terms(x))
-  cl <- sapply(data[, nm], function(x) class(x)[1L])
+  cl <- attr(terms(x), "dataClasses")
   yi <- attr(terms(x), "response")
   nm <- nm[-yi]
   
@@ -514,7 +514,7 @@ breaks_image <- function(bri, br0 = NULL, tx0 = NULL, B = NULL, ylab = "Repetiti
 #     nr)), col = col, ylab = ylab, xlab = xlab)
   
   grid(nx = nc, ny = NA, col = "#4D4D4D", lty = "solid")
-  axis(1, at = seq(nc) - 0.5, labels = colnames(bri), lwd = 0, lwd.ticks = 1)
+  axis(1, at = seq(nc), labels = colnames(bri), lwd = 0, lwd.ticks = 1)
   axis(2)
   
   if (!is.null(br0)) {
