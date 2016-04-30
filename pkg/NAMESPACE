@@ -7,6 +7,7 @@ importFrom("grDevices",
 
 importFrom("stats",
   "getCall",
+  "model.frame",
   "na.omit",
   "terms",
   "update"
@@ -23,7 +24,7 @@ export(
   ## sampler convenience functions
   "bootstrap",
   "subsampling",
-  "crossvalidation",
+  "samplesplitting",
   "jackknife"
 )
 
