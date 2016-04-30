@@ -254,7 +254,7 @@ print.summary.stabletree <- function(x, ...)
   cat("Method =", x$method)
   cat("\n\nVariable selection overview:\n\n")
   print(x$vstab)
-  cat("(* = complete data tree)\n")
+  cat("(* = original tree)\n")
   if (!is.null(x$br)) {
     cat("\n\n")
     print(x$br)
