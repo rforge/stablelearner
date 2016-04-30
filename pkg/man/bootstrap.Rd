@@ -1,6 +1,6 @@
 \name{bootstrap}
 \alias{bootstrap}
-\alias{crossvalidation}
+\alias{samplesplitting}
 \alias{jackknife}
 \alias{subsampling}
 
@@ -14,13 +14,13 @@
 \usage{
   bootstrap(B = 500)
   subsampling(B = 500, frac = 0.8)
-  crossvalidation(k = 5)
+  samplesplitting(k = 5)
   jackknife(d = 1, maxrep = 5000)
 }
 
 \arguments{
   \item{B}{An integer value specifying the number of resampled datasets.}
-  \item{k}{An integer value specifying the number of folds in cross validation.}
+  \item{k}{An integer value specifying the number of folds in sample-splitting.}
   \item{d}{An integer value specifying the number of observations left out in jackknife.}
   \item{maxrep}{An integer value specifying the maximum number of resampled datasets allowed, when using jackknife.}
   \item{frac}{A numeric value between 0 and 1 specifying the fraction of observations in each subsample.}
@@ -39,7 +39,7 @@
   generate \code{B} subsamples by sampling from \code{floor(frac*n)} 
   observations without replacement.
 
-  The \code{crossvalidation} function provides an object that can be used to 
+  The \code{samplesplitting} function provides an object that can be used to 
   generate \code{k}-folds from \code{n} observations.
 
   The \code{jackknife} function provides an object that can be used to generate
@@ -63,8 +63,8 @@ s$sampler(10)
 s <- subsampling(3, frac = 0.6)
 s$sampler(10)
 
-## 5-fold cross-validation
-s <- crossvalidation(5)
+## 5-fold sample-splitting
+s <- samplesplitting(5)
 s$sampler(10)
 
 ## jackknife
