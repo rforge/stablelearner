@@ -1,0 +1,22 @@
+citHeader("To cite stablelearner/stabletree in publications use:")
+
+citEntry(entry = "TechReport",
+  title        = "A Toolkit for Stability Assessment of Tree-Based Learners",
+  author       = personList(as.person("Michel Philipp"), 
+		   as.person("Achim Zeileis"), 
+		   as.person("Carolin Strobl")),
+  institution  = "Working Papers in Economics and Statistics, Research Platform Empirical
+  		  and Experimental Economics, Universit\\\"at Innsbruck",
+  year         = "2016",
+  type         = "Working Paper",
+  number       = "2016-11",
+  month        = "May",
+  url	       = "http://EconPapers.RePEc.org/RePEc:inn:wpaper:2016-11",
+  
+  textVersion  = 
+  paste("Michel Philipp, Achim Zeileis, Carolin Strobl (2016).",
+	"A Toolkit for Stability Assessment of Tree-Based Learners.",
+ 	"Working Paper 2016-11.",
+ 	"Working Papers in Economics and Statistics, Research Platform Empirical and Experimental Economics, Universitaet Innsbruck.",
+	"URL http://EconPapers.RePEc.org/RePEc:inn:wpaper:2016-11"),
+)

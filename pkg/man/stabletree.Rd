@@ -4,6 +4,8 @@
 \alias{summary.stabletree}
 \alias{print.summary.stabletree}
 
+\encoding{latin1}
+
 \title{Stability Assessment for Tree Learners}
 
 \description{
@@ -71,6 +73,12 @@
 Hothorn T, Zeileis A (2015).
   partykit: A Modular Toolkit for Recursive Partytioning in R.
   \emph{Journal of Machine Learning Research}, \bold{16}, 3905--3909.
+
+Philipp M, Zeileis A, Strobl C (2016).
+  \dQuote{A Toolkit for Stability Assessment of Tree-Based Learners}.
+  Working Paper 2016-11. Working Papers in Economics and Statistics,
+  Research Platform Empirical and Experimental Economics, Universität Innsbruck.
+  \url{http://EconPapers.RePEc.org/RePEc:inn:wpaper:2016-11}
 }
 
 \seealso{\code{\link{plot.stabletree}}, \code{\link[partykit]{as.party}}}
