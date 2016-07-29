@@ -49,6 +49,7 @@ stabletree <- function(x, data = NULL, sampler = bootstrap,
   mf <- model.frame(x, data = data)
   tr <- terms(x)
   cl <- attr(tr, "dataClasses")
+  if(is.null(cl)) cl <- attr(terms(mf), "dataClasses")
   yi <- attr(tr, "response")
   nm <- names(cl)
   nm <- nm[-yi]
