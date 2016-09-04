@@ -5,6 +5,10 @@ Title: Stability Assessment of Statistical Learning Methods
 Authors@R: c(person(given = "Michel", family = "Philipp", role = c("aut", "cre"), email = "M.Philipp@psychologie.uzh.ch"),
              person(given = "Carolin", family = "Strobl", role = "aut", email = "Carolin.Strobl@psychologie.uzh.ch"),
              person(given = "Achim", family = "Zeileis", role = "aut", email = "Achim.Zeileis@R-project.org"))
+Author: Michel Philipp [aut, cre],
+	Carolin Strobl [aut],
+	Achim Zeileis [ctb]
+Maintainer: Michel Philipp <M.Philipp@psychologie.uzh.ch>
 Description: Graphical and computational methods that can be used to assess the stability of
   results from statistical learning. Currently, only methods for assessing the stability of trees (i.e.,
   recursive partitioning methods) are provided.
