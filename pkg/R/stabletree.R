@@ -50,11 +50,13 @@ stabletree <- function(x, data = NULL, sampler = bootstrap,
   tr <- terms(x)
   cl <- attr(tr, "dataClasses")
   if(is.null(cl)) cl <- attr(terms(mf), "dataClasses")
+  os <- which(names(cl) == "(offset)")
   yi <- attr(tr, "response")
   nm <- names(cl)
-  nm <- nm[-yi]
+  nm <- nm[-c(yi, os)]
 
   ## convert original tree to party (if necessary)
+  call <- getCall(x)
   if (!inherits(x, "party")) 
     x <- as.party(x)
   
@@ -179,14 +181,14 @@ stabletree <- function(x, data = NULL, sampler = bootstrap,
   
   ## collect observed and bootstrapped results
   rval <- list(
-    call = getCall(x),
+    call = call,
     B = B,
     sampler = sampler,
     vs0 = extract_varid(x), 
     br0 = extract_splitinfo(x),
     vs = vi_mat,
     br = add_levels(br),
-    classes = cl[-yi]
+    classes = cl[-c(yi,os)]
   )
   class(rval) <- "stabletree"
   return(rval)
