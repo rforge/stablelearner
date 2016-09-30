@@ -38,8 +38,10 @@ stabletree <- function(x, data = NULL, sampler = bootstrap,
   xx <- applyfun(1L:B, function(i) {
     datai <- data[na.omit(bix[, i]), , drop = FALSE]
     xi <- update(x, data = datai)
-    if (!inherits(xi, "party")) 
+    if (!inherits(xi, "party")) {
+      if (inherits(xi, "rpart")) environment(xi$terms) <- new.env()
       xi <- partykit::as.party(xi)
+    }
     xi$data <- xi$data[0L, , drop = FALSE]
     return(xi)
   })
