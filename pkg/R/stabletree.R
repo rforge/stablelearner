@@ -1,8 +1,9 @@
 ### -- user interface ----------------------------------------------------------
 
-stabletree <- function(x, data = NULL, sampler = bootstrap,
+stabletree <- function(x, data = NULL, sampler = bootstrap, weights = NULL, 
   applyfun = NULL, cores = NULL, ...)
 {
+  
   ## process sampler
   if (is.character(sampler)) 
     sampler <- get(sampler, mode = "function", envir = parent.frame())
@@ -20,11 +21,30 @@ stabletree <- function(x, data = NULL, sampler = bootstrap,
   if (is.null(data))
     data <- eval(getCall(x)$data)  #FIXME# more elegant default?
   n <- nrow(data)
+
+  ## get call
+  call <- getCall(x)
+  ## are weights supported?
+  wsup <- "weights" %in% formalArgs(as.character(call[[1L]]))
   
-  ## draw bootstrap samples
-  bix <- sampler$sampler(n)
-  B <- ncol(bix)
-  
+  ## generate or adopt weights
+  if(is.null(weights)) {
+    bix <- sampler$sampler(n)
+    B <- ncol(bix)
+  } else {
+    if(wsup) {
+      if(isTRUE(weights)) {
+        bix <- sampler$sampler(n)
+        wix <- apply(bix, 2, tabulate, nbins = n)
+      } else {
+        wix <- weights
+      }
+      B <- ncol(wix)
+    } else {
+      stop("Weights not supported by the learner! Please use sampler argument instead.")
+    }
+  }
+
   ## facilitate parallelization
   if (is.null(applyfun)) {
     applyfun <- if (is.null(cores)) {
@@ -36,13 +56,18 @@ stabletree <- function(x, data = NULL, sampler = bootstrap,
 
   ## bootstrap trees (and omit data copy from tree)
   xx <- applyfun(1L:B, function(i) {
-    datai <- data[na.omit(bix[, i]), , drop = FALSE]
-    xi <- update(x, data = datai)
+    if(is.null(weights)) {
+      datai <- data[na.omit(bix[, i]), , drop = FALSE]
+      xi <- update(x, data = datai)
+    } else {
+      xi <- update(x, weights = wix[,i])
+    }
     if (!inherits(xi, "party")) {
       if (inherits(xi, "rpart")) environment(xi$terms) <- new.env()
       xi <- partykit::as.party(xi)
     }
     xi$data <- xi$data[0L, , drop = FALSE]
+    xi$data <- xi$data[!(names(xi$data) %in% c("(weights)"))]
     return(xi)
   })
   
@@ -52,13 +77,12 @@ stabletree <- function(x, data = NULL, sampler = bootstrap,
   tr <- terms(x)
   cl <- attr(tr, "dataClasses")
   if(is.null(cl)) cl <- attr(terms(mf), "dataClasses")
-  os <- which(names(cl) == "(offset)")
+  no <- which(names(cl) %in% c("(offset)", "(weights)"))
   yi <- attr(tr, "response")
   nm <- names(cl)
-  nm <- nm[-c(yi, os)]
+  nm <- nm[-c(yi, no)]
 
   ## convert original tree to party (if necessary)
-  call <- getCall(x)
   if (!inherits(x, "party")) 
     x <- as.party(x)
   
@@ -71,14 +95,16 @@ stabletree <- function(x, data = NULL, sampler = bootstrap,
   
   ## function for extracting variable id from trees
   extract_varid <- function(x) {
-    nm <- attr(terms(x), "term.labels")
-    sp <- extract_split(x)
-    if (!is.null(sp)) {
-      vi <- sapply(sp, "[[", "varid") - 1L
-      vi <- sort(unique(vi))
+    if(inherits(x, c("party", "constparty"))) {
+      nm <- attr(terms(x), "term.labels")
+      sp <- extract_split(x)
+      if (!is.null(sp)) {
+        vi <- sapply(sp, "[[", "varid") - 1L
+        vi <- sort(unique(vi))
+      } else vi <- NULL
+      vi <- as.numeric(nm %in% nm[vi])
+      names(vi) <- nm
     } else vi <- NULL
-    vi <- as.numeric(nm %in% nm[vi])
-    names(vi) <- nm
     return(vi)
   }
   
@@ -190,7 +216,7 @@ stabletree <- function(x, data = NULL, sampler = bootstrap,
     br0 = extract_splitinfo(x),
     vs = vi_mat,
     br = add_levels(br),
-    classes = cl[-c(yi,os)]
+    classes = cl[-c(yi,no)]
   )
   class(rval) <- "stabletree"
   return(rval)
@@ -299,7 +325,7 @@ barplot.stabletree <- function(height, main = "Variable selection frequencies",
     xlab = xlab, ylab = ylab, axes = FALSE, las = ifelse(horiz, 2, 1), ...)
   
   if (horiz) {
-    axis(1)
+  axis(1)
   } else {
     axis(2, las = 2)
     if (names.diag) {

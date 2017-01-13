@@ -3,9 +3,9 @@ bootstrap <- function(B = 500) {
   list(method = "Bootstrap sampling", sampler = sampfun)
 }
 
-subsampling <- function(B = 500, frac = 0.8) {
-  sampfun <- function(n) replicate(B, sample(1L:n, floor(frac * n), replace = FALSE))
-  list(method = paste0("Subsampling with ", sprintf("%1.1f", 100 * frac, 2), "% data"), 
+subsampling <- function(B = 500, v = 0.8) {
+  sampfun <- function(n) replicate(B, sample(1L:n, floor(v * n), replace = FALSE))
+  list(method = paste0("Subsampling with ", sprintf("%1.1f", 100 * v, 2), "% data"), 
     sampler = sampfun)
 }
 
@@ -26,3 +26,9 @@ jackknife <- function(d = 1, maxrep = 5000) {
   }
   list(method = paste0("Leave-", d, "-out jackknife"), sampler = sampfun)
 } 
+
+splithalf <- function (B = 500)
+{
+  sampfun <- function(n) replicate(B, sample(1L:n, floor(1/2 * n), replace = FALSE))
+  list(method = "Split-half sampling", sampler = sampfun)
+}

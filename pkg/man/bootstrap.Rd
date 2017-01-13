@@ -3,6 +3,7 @@
 \alias{samplesplitting}
 \alias{jackknife}
 \alias{subsampling}
+\alias{splithalf}
 
 \title{Sampler Infrastructure for Stability Assessment}
 
@@ -13,9 +14,10 @@
 
 \usage{
   bootstrap(B = 500)
-  subsampling(B = 500, frac = 0.8)
+  subsampling(B = 500, v = 0.8)
   samplesplitting(k = 5)
   jackknife(d = 1, maxrep = 5000)
+  splithalf(B = 500)
 }
 
 \arguments{
@@ -23,7 +25,7 @@
   \item{k}{An integer value specifying the number of folds in sample-splitting.}
   \item{d}{An integer value specifying the number of observations left out in jackknife.}
   \item{maxrep}{An integer value specifying the maximum number of resampled datasets allowed, when using jackknife.}
-  \item{frac}{A numeric value between 0 and 1 specifying the fraction of observations in each subsample.}
+  \item{v}{A numeric value between 0 and 1 specifying the fraction of observations in each subsample.}
 }
 
 \details{
@@ -36,7 +38,7 @@
   replacement.
 
   The \code{subsampling} function provides an object that can be used to 
-  generate \code{B} subsamples by sampling from \code{floor(frac*n)} 
+  generate \code{B} subsamples by sampling from \code{floor(v*n)} 
   observations without replacement.
 
   The \code{samplesplitting} function provides an object that can be used to 
@@ -47,10 +49,17 @@
   \code{n} observations. The number of datasets is limited by \code{maxrep} to 
   prevent unintended CPU or memory overload by accidently choosing too large 
   values for \code{k}.
-  
+
+  The \code{splithalf} function provides an object that can be used to 
+  generate \code{B} subsamples by sampling from \code{floor(0.5*n)} 
+  observations without replacement. When used to implement the "splithalf" 
+  resampling strategy for measuring the stability of a result via the 
+  \code{\link{stability}} function, the matrix containing the complement
+  learning samples is generated automatically by \code{\link{stability}}.
+
 }
 
-\seealso{\code{\link{stabletree}}}
+\seealso{\code{\link{stabletree}}, \code{\link{stability}}}
 
 \examples{
 set.seed(0)
@@ -60,7 +69,7 @@ s <- bootstrap(3)
 s$sampler(10)
 
 ## subsampling
-s <- subsampling(3, frac = 0.6)
+s <- subsampling(3, v = 0.6)
 s$sampler(10)
 
 ## 5-fold sample-splitting
@@ -69,6 +78,10 @@ s$sampler(10)
 
 ## jackknife
 s <- jackknife(d = 1)
+s$sampler(10)
+
+## splithaf
+s <- splithalf(3)
 s$sampler(10)
 }
 

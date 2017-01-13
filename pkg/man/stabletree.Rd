@@ -17,7 +17,7 @@
 }
 
 \usage{
-  stabletree(x, data = NULL, sampler = bootstrap,
+  stabletree(x, data = NULL, sampler = bootstrap, weights = NULL,
     applyfun = NULL, cores = NULL, \dots)
 }
 
@@ -29,6 +29,9 @@
     is used (if this can be inferred from the \code{\link[stats]{getCall}} of \code{x}.}
   \item{sampler}{a resampling (generating) function. Either this should be a function
     of \code{n} that returns a matrix or a sampler generator like \code{\link{bootstrap}}.}
+  \item{weights}{an optional matrix of dimension n * B that can be used to 
+    weight the observations from the original learning data when the trees 
+    are refitted. If \code{weight = NULL}, the \code{sampler} will be used.}
   \item{applyfun}{a \code{\link[base]{lapply}}-like function. The default is to use
     \code{\link[base]{lapply}} unless \code{cores} is specified in which case
     \code{\link[parallel]{mclapply}} is used (for multicore computations on platforms
@@ -74,11 +77,19 @@ Hothorn T, Zeileis A (2015).
   partykit: A Modular Toolkit for Recursive Partytioning in R.
   \emph{Journal of Machine Learning Research}, \bold{16}, 3905--3909.
 
-Philipp M, Zeileis A, Strobl C (2016).
-  \dQuote{A Toolkit for Stability Assessment of Tree-Based Learners}.
-  Working Paper 2016-11. Working Papers in Economics and Statistics,
-  Research Platform Empirical and Experimental Economics, Universit‰t Innsbruck.
+%Philipp M, Zeileis A, Strobl C (2016).
+%  \dQuote{A Toolkit for Stability Assessment of Tree-Based Learners}.
+%  Working Paper 2016-11. Working Papers in Economics and Statistics,
+%  Research Platform Empirical and Experimental Economics, Universit√§t Innsbruck.
+
+Philipp, M., Zeileis, A., and Strobl, C. (2016).
+  \dQuote{A toolkit for stability assessment of tree-based learners}. 
+  In A. Colubi, A. Blanco, and C. Gatu (Eds.), Proceedings of compstat 2016 --
+  22nd international conference on computational statistics (pp. 315--325). 
+  The International Statistical Institute/International Association for
+  Statistical Computing. Preprint available here: 
   \url{http://EconPapers.RePEc.org/RePEc:inn:wpaper:2016-11}
+
 }
 
 \seealso{\code{\link{plot.stabletree}}, \code{\link[partykit]{as.party}}}
