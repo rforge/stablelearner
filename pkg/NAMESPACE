@@ -20,6 +20,7 @@ importFrom("parallel",
 export(
   ## stability assessment
   "stabletree",
+  ".stabEnv",
   "stability",
   "stab_control",
 

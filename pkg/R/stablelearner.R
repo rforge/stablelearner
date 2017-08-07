@@ -82,7 +82,7 @@ stability <- function(x, ..., data = NULL, control = stab_control(),
   m <- lapply(x, getLearner)
   
   rng <- RNGkind()
-  
+
   rval <- lapply(1L:nlearner, function(k) {
     ## process random number generator
     if(!is.null(control$seed))
@@ -157,7 +157,7 @@ process_sampler <- function(n, sampler, evaluate, holdout, weights) {
 
 stability_internal <- function(x, learner, data, weights, control, 
                                applyfun, cores, ...) {
-  
+
   B        <- control$B
   measure  <- control$measure
   sampler  <- control$sampler
@@ -186,11 +186,11 @@ stability_internal <- function(x, learner, data, weights, control,
   ## data extraction and resampling
   if(!is.function(data)) {
     call <- getCall(x)
-    if (is.null(data)) data <- eval(call$data)  #FIXME# more elegant default?
+    if (is.null(data)) data <- eval(call$data, parent.frame())  #FIXME# more elegant default?
     n <- nrow(data)
     samp <- process_sampler(n, sampler, evaluate, holdout, weights)
   }
-  
+
   ## exclude measures that are not valid for the response class of the model
   measure <- lapply(measure, function(x) {
     if(yclass %in% x$classes) x else NULL
