@@ -28,30 +28,32 @@ stabletree <- function(x, data = NULL, sampler = bootstrap, weights = NULL,
   ## get data
   if (is.null(data)) {
     if (is.null(call$data)) {
-      vars <- attr(tr, "variables")
-      data <- eval(vars, envir = env, enclos = parent.frame())
-      names(data) <- as.character(vars)[-1]
-      data <- as.data.frame(data)
+      ## there is no data object
+      data <- NULL
     } else
+      ## get local copy of data object from where x was generated
       data <- eval(call$data, envir = env, enclos = parent.frame())
+      if(!is.null(call$subset)) {
+        subs <- eval(call$subset, envir = env, enclos = parent.frame())
+        data <- subset(data, subset = subs)
+      }
   }
+  
+  # if (is.null(data)) {
+  #   if (is.null(call$data)) {
+  #     vars <- attr(tr, "variables")
+  #     data <- eval(vars, envir = env, enclos = parent.frame())
+  #     names(data) <- as.character(vars)[-1]
+  #     data <- as.data.frame(data)
+  #   } else
+  #     data <- eval(call$data, envir = env, enclos = parent.frame())
+  # }
 
   ## get sample size
-  n <- NROW(data)
-
-  ## old implementation
-  # ## data extraction
-  # if (is.null(data)) {
-  #   ## data object provided?
-  #   if(is.null(call$data))
-  #     ## no: receive data from model frame
-  #     data <- model.frame(x)
-  #   else
-  #     ## yes: evaluate data object from the parent envoronment
-  #     data <- eval(call$data, envir = parent.frame())
-  # }
-  # n <- nrow(data)
-
+  if(is.null(data))  {
+    n <- NROW(eval(tr[[2]], envir = env, enclos = parent.frame()))
+  } else n <- NROW(data)
+  
   ## are weights supported?
   wsup <- "weights" %in% formalArgs(as.character(call[[1L]]))
   
@@ -85,22 +87,19 @@ stabletree <- function(x, data = NULL, sampler = bootstrap, weights = NULL,
   ## bootstrap trees (and omit data copy from tree)
   xx <- applyfun(1L:B, function(i) {
 
-    if(is.null(weights)) {
-      datai <- data[na.omit(bix[, i]), , drop = FALSE]
-      assign(".stabletreeData", datai, envir = .stabEnv)
-      up <- update(x, data = .stabEnv$.stabletreeData, evaluate = FALSE)
-      # subset <- 1L:n %in% na.omit(bix[, i])
-      # assign(".stabletreeSubset", subset, envir = .stabEnv)
-      # up <- update(x, subset = .stabEnv$.stabletreeSubset, evaluate = FALSE)
-    } else {
-      assign(".stabletreeWeights", wix[,i], envir = .stabEnv)
+    if(is.null(data)) {
+      if(is.null(weights)) wix <- apply(bix, 2L, tabulate, nbins = n)
+      assign(".stabletreeWeights", na.omit(wix[,i]), envir = .stabEnv)
       up <- update(x, weights = .stabEnv$.stabletreeWeights, evaluate = FALSE)
+      xi <- eval(up, envir = env, enclos = parent.frame())
+      remove(".stabletreeWeights", envir = .stabEnv)
+    } else {
+      if(is.null(weights)) {
+        xi <- update(x, data = data[na.omit(bix[, i]), , drop = FALSE])
+      } else {
+        xi <- update(x, data = data, weights = na.omit(wix[,i]))
+      }
     }
-    
-    # env <- try(environment(terms(x)))
-    # if(inherits(env, "try-error")) env <- NULL
-    
-    xi <- eval(up, envir = env, enclos = parent.frame())
     
     ## old implementation
     # if(is.null(weights)) {
@@ -110,28 +109,18 @@ stabletree <- function(x, data = NULL, sampler = bootstrap, weights = NULL,
     #   xi <- update(x, weights = wix[,i])
     # }
 
-    if (!inherits(xi, "party")) {
-      if (inherits(xi, "rpart")) environment(xi$terms) <- .stabEnv
-      xi <- partykit::as.party(xi)
-    }
+    if (!inherits(xi, "party")) xi <- partykit::as.party(xi)
     
     xi$data <- xi$data[0L, , drop = FALSE]
     xi$data <- xi$data[!(names(xi$data) %in% c("(weights)"))]
     
-    if(is.null(weights))
-      remove(".stabletreeData", envir = .stabEnv)
-    else
-      remove(".stabletreeWeights", envir = .stabEnv)
-    
     return(xi)
+    
   })
   
   ## extract names of all variables and omit response (FIXME: currently assuming a
   ## single response)
-
-  # mf <- model.frame(x, data = data) # before na.exclude()
-  
-  mf <- model.frame(tr, data = data) # after na.exclude()
+  mf <- model.frame(tr, data = data)
   yi <- attr(tr, "response")
   x_classes <- attr(tr, "dataClasses")[-yi] # sapply(mf[, -yi, drop = FALSE], class)
   if(is.null(x_classes)) x_classes <- sapply(mf[, -yi, drop = FALSE], function(x) class(x)[1])
@@ -139,6 +128,13 @@ stabletree <- function(x, data = NULL, sampler = bootstrap, weights = NULL,
   x_nlevels <- sapply(mf[, -yi, drop = FALSE], nlevels)
   x_names   <- names(mf[-yi])
 
+  # cat("nrow(data):", nrow(data), "\n")
+  # cat("nrow(mf):", nrow(mf), "\n")
+  # if(is.null(weights))
+  #   cat("nrow(bix):", nrow(bix), "\n")
+  # else
+  #   cat("nrow(wix):", nrow(wix), "\n")
+  
   ## old implementation
   # cl <- attr(tr, "dataClasses")
   # if(is.null(cl)) {
