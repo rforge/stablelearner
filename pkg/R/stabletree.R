@@ -19,41 +19,38 @@ stabletree <- function(x, data = NULL, sampler = bootstrap, weights = NULL,
     }
   }
   
-  ## get call, terms ad environment of x
-  call <- getCall(x)
+  ## get terms
   tr   <- terms(x)
-  env <- try(environment(terms(x)))
+
+  ## get envoronment of x
+  env <- try(environment(tr))
   if(inherits(env, "try-error")) env <- NULL
+
+  ## extract information from call
+  call <- getCall(x)
+  sfit <- call$subset
+  wfit <- call$weights
+  dfit <- call$data
 
   ## get data
   if (is.null(data)) {
-    if (is.null(call$data)) {
+    if (is.null(dfit)) {
       ## there is no data object
       data <- NULL
     } else
       ## get local copy of data object from where x was generated
-      data <- eval(call$data, envir = env, enclos = parent.frame())
-      if(!is.null(call$subset)) {
-        subs <- eval(call$subset, envir = env, enclos = parent.frame())
-        data <- subset(data, subset = subs)
+      data <- eval(dfit, envir = env, enclos = parent.frame())
+      if(!is.null(sfit)) {
+        sfit <- eval(sfit, envir = env, enclos = parent.frame())
+        data <- subset(data, subset = sfit)
       }
   }
-  
-  # if (is.null(data)) {
-  #   if (is.null(call$data)) {
-  #     vars <- attr(tr, "variables")
-  #     data <- eval(vars, envir = env, enclos = parent.frame())
-  #     names(data) <- as.character(vars)[-1]
-  #     data <- as.data.frame(data)
-  #   } else
-  #     data <- eval(call$data, envir = env, enclos = parent.frame())
-  # }
 
   ## get sample size
   if(is.null(data))  {
-    n <- NROW(eval(tr[[2]], envir = env, enclos = parent.frame()))
+    n <- NROW(eval(attr(tr, "variables"), envir = env, enclos = parent.frame())[[1]])
   } else n <- NROW(data)
-  
+
   ## are weights supported?
   wsup <- "weights" %in% formalArgs(as.character(call[[1L]]))
   
@@ -69,6 +66,10 @@ stabletree <- function(x, data = NULL, sampler = bootstrap, weights = NULL,
       } else {
         wix <- weights
       }
+      if(!is.null(wfit)) {
+        wfit <- eval(wfit, envir = env, enclos = parent.frame())
+        wix <- wix * wfit
+      } 
       B <- NCOL(wix)
     } else {
       stop("Weights not supported by the learner! Please use sampler argument instead.")
@@ -101,14 +102,6 @@ stabletree <- function(x, data = NULL, sampler = bootstrap, weights = NULL,
       }
     }
     
-    ## old implementation
-    # if(is.null(weights)) {
-    #   datai <- data[na.omit(bix[, i]), , drop = FALSE]
-    #   xi <- update(x, data = datai)
-    # } else {
-    #   xi <- update(x, weights = wix[,i])
-    # }
-
     if (!inherits(xi, "party")) xi <- partykit::as.party(xi)
     
     xi$data <- xi$data[0L, , drop = FALSE]
@@ -118,12 +111,10 @@ stabletree <- function(x, data = NULL, sampler = bootstrap, weights = NULL,
     
   })
   
-  ## extract names of all variables and omit response (FIXME: currently assuming a
-  ## single response)
+  ## extract names of all variables and omit response
   mf <- model.frame(tr, data = data)
   yi <- attr(tr, "response")
-  x_classes <- attr(tr, "dataClasses")[-yi] # sapply(mf[, -yi, drop = FALSE], class)
-  if(is.null(x_classes)) x_classes <- sapply(mf[, -yi, drop = FALSE], function(x) class(x)[1])
+  x_classes <- sapply(mf[, -yi, drop = FALSE], function(x) class(x)[1])
   x_levels  <- sapply(mf[, -yi, drop = FALSE], levels)
   x_nlevels <- sapply(mf[, -yi, drop = FALSE], nlevels)
   x_names   <- names(mf[-yi])
@@ -134,17 +125,6 @@ stabletree <- function(x, data = NULL, sampler = bootstrap, weights = NULL,
   #   cat("nrow(bix):", nrow(bix), "\n")
   # else
   #   cat("nrow(wix):", nrow(wix), "\n")
-  
-  ## old implementation
-  # cl <- attr(tr, "dataClasses")
-  # if(is.null(cl)) {
-  #   cl <- sapply(vars, class)
-  # }
-  # if(is.null(cl)) cl <- attr(terms(mf), "dataClasses")
-  # no <- which(names(cl) %in% c("(offset)", "(weights)"))
-  # yi <- attr(tr, "response")
-  # nm <- names(cl)
-  # nm <- nm[-yi]
 
   ## convert original tree to party (if necessary)
   if (!inherits(x, "party")) 
