@@ -1,6 +1,6 @@
 ---
 title: "Stability Assessment of Results from Supervised Statistical Learning"
-author: "Michel Philipp, Thomas Tusch, Kurt Hornik, and Carolin Strobl"
+author: "Michel Philipp, Thomas Rusch, Kurt Hornik, and Carolin Strobl"
 date: "`r Sys.Date()`"
 output: 
   html_document:
