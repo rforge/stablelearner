@@ -1,0 +1,367 @@
+---
+title: "Stability Assessment of Results from Supervised Statistical Learning"
+author: "Michel Philipp, Thomas Tusch, Kurt Hornik, and Carolin Strobl"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    theme: united
+# rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Stability Assessment of Results from Supervised Statistical Learning}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Introduction
+
+The R package **stablelearner** implements a general framework for investigating
+and quantifying the stability of analytic results from supervised 
+statistical learning, both when a data set (as in real world supervised learning
+problems) or the data-generating process (DGP; as in simulation studies) is 
+available. The framework can support data analysts in measuring the stability 
+of a single analysis result, in choosing the most stable  algorithm among a set 
+of candidates, or in selecting tuning parameters with respect to stability.
+Stability can also be used as an additional performance criterion in benchmark
+experiments.
+
+### Getting started
+
+In every new R session  **stablelearner** must be loaded via
+
+```{r, message=FALSE}
+library("stablelearner")
+```
+
+The documentation of the package (with help pages for each function) can be 
+accessed via
+
+```{r}
+help(package = "stablelearner")
+```
+
+### The *Titanic* example
+
+For the demonstration of the stability assessment procedure the well-known 
+*Titanic* data set is used (see `?titanic` for a detailed description of the 
+data set). The data set is available in **stablelearner** and can be activated 
+using
+
+```{r}
+data("titanic")
+```
+
+The goal is to predict the survival of the passengers during the sinking of the
+RMS Titanic in 1912 through passenger characteristics that are given by seven
+predictor variables of mixed types (numeric, unordered and ordered categorical).
+Using the symbolic formulation in R, the model is defined by
+
+```{r}
+fmla <- survived ~ gender + age + class + embarked + fare + sibsp + parch
+```
+
+For our purpose, the data set is reduced to the passengers on the RMS Titanic
+(i.e., crew members are excluded from the data set) and further pre-processing
+is applied.
+
+```{r}
+titanic_pax <- subset(titanic, class %in% c("1st", "2nd", "3rd"))
+titanic_pax$sibsp <- as.numeric(titanic_pax$sibsp)
+titanic_pax$parch <- as.numeric(titanic_pax$parch)
+titanic_pax <- titanic_pax[,all.vars(fmla)]
+titanic_pax <- titanic_pax[complete.cases(titanic_pax),]
+titanic_pax <- droplevels(titanic_pax)
+```
+
+In the introduction presented in the next section, the model will be trained
+using conditional inference trees from **partykit**. However, **stablelearner** 
+also works with many other statistical learning methods that are implemented in 
+or available through R.
+
+## Stability assessment for a single learner
+
+The procedure to measure the stability of results contains two steps. First,
+**partykit**, that provides the functions to fit conditional inference trees, 
+is loaded and a result is generated using the *Titanic* data set and the 
+formula specified above.
+
+```{r}
+library("partykit")
+res1 <- ctree(fmla, data = titanic_pax)
+```
+
+Then, the resulting model object is passed to the function `stability()` for 
+the stability assessment (the default settings are used if nothing else is
+specified).
+
+```{r}
+stab <- stability(res1)
+```
+
+Parallelization may be utilized through the argument `cores` for multicore
+computation based on **parallel**. Please note, that parallelization only works 
+with platforms that support this.
+
+A summary of the sampling and the estimated similarity values can now be shown 
+via
+
+```{r}
+summary(stab)
+```
+
+The default similarity measure for classification problems is the total
+variation distance (TVD). The values are automatically reversed such that
+higher values indicate higher stability. If not desired, this can be suppressed
+by `summary(stab, reverse = FALSE)`.
+
+## Stability assessment for several learners
+
+Typically, users are interested in either selecting the algorithm with the
+highest stability or tuning the parameters of an algorithm with respect to
+stability for a given data set. Both problems can be addressed by passing
+several results to the `stability()` function.
+
+### Selecting an algorithm with respect to stability
+
+The next example demostrates the comparison of different recursive partitioning
+algorithms for a given model and data set. The competing algorithms are
+conditional inference trees (the result generated before will be re-used) and 
+two different implementations of classification and regression trees (CART). 
+The default settings were used for all implementations and no pruning for the
+CART implementations.
+
+First, the packages that provide the functions to train the data with the 
+algorithms of interest must be loaded to the current R session:
+
+```{r}
+library("rpart")
+library("tree")
+```
+
+Next, for each algorithm an initial result must be generated for the same model 
+and data set:
+
+```{r}
+res2 <- rpart(fmla, data = titanic_pax)
+res3 <- tree(fmla, data = titanic_pax)
+```
+
+The stability can be assessed jointly by passing all objects to the `stability()` 
+function. For comparability, a seed may be set via the `control` argument, such 
+that the stability of each result is assessed using the same resampled data 
+sets.
+
+```{r}
+stab_alg <- stability(res1, res2, res3, control = stab_control(seed = 1234))
+```
+
+Again, the summary is shown via the generic function `summary()`. Optionally, 
+labels may be passed via the argument `names` for a better recognition of the 
+results in its output.
+
+```{r}
+summary(stab_alg, names = c("ctree", "rpart", "tree"))
+```
+
+The similarity distribution may be illustrated graphically. A simple plot can
+be generated with the generic standard R plotting function:
+
+```{r}
+boxplot(stab_alg, names = c("ctree", "rpart", "tree"))
+```
+
+For comparison, the accuracy may be computed and illustrated. Available 
+accuracy measures for classification problems are the Accuracy (percentage of 
+observations on the diagonal of the contingency table), the Kappa statistic, 
+the Rand index and the corrected Rand index. For more details see 
+`?e1071::classAgreement`.
+
+```{r}
+acc_alg <- accuracy(stab_alg)
+boxplot(acc_alg, names = c("ctree", "rpart", "tree"), ylab = "Kappa statistic")
+```
+
+### Parameter tuning with respect to stability
+
+As before the function `stability()` can be used for comparing results that 
+where generated using different values for a tuning parameters of a specific 
+algorithm. The next example demostrates how to find the optimal number of hidden 
+units in a single-hidden-layer neural network with respect to stability.
+
+First, load the package **nnet** that provides the function to fit a 
+single-hidden-layer neural network in \proglang{R} and fit several results with 
+different value for the tuning parameter.
+
+```{r, eval=FALSE}
+library("nnet")
+res1 <- nnet(fmla, data = titanic_pax, size = 1, trace = FALSE)
+res2 <- nnet(fmla, data = titanic_pax, size = 2, trace = FALSE)
+res3 <- nnet(fmla, data = titanic_pax, size = 3, trace = FALSE)
+...
+tune <- list(res1, res2, res3, ...)
+```
+
+Alternatively one can use the `tuner()` function and define the range of
+values for the tuning parameter via the argument `tunerange`.
+
+```{r}
+library("nnet")
+tune <- tuner("nnet", formula = fmla, data = titanic_pax, trace = FALSE,
+              tunerange = list(size = 1:9))
+```
+
+Next, the results are passed to the `stability` function (either separately
+as in described above or as part of a list).
+
+```{r}
+stab_tune <- stability(tune, control = stab_control(seed = 1234), cores = 4)
+```
+
+The estimated stability distribution can now be illustrated using the
+`boxplot()` function.
+
+```{r}
+boxplot(stab_tune, xlab = "Number of hidden units")
+```
+
+The `accuracy()` function provides measures of accuracy that may be useful
+for comparison.
+
+```{r}
+acc_tune <- accuracy(stab_tune)
+boxplot(acc_tune, xlab = "Number of hidden units", ylab = "Kappa statistic")
+```
+
+## Special topics
+
+### Changing the framework settings
+
+The number of repetitions ($B$), the similarity measure, the resampling and
+evaluation scheme and more settings of the framework can be modified via the
+`stab_control()` function in combination with the `control` argument in the 
+function `stability()`:
+
+```{r, eval=FALSE}
+stability(res1, control = stab_control(...))
+```
+
+The default choice of the number of repetitions during the resampling
+process is $B = 500$. It may be changed to any positive integer by using
+```{r, eval=FALSE, prompt=FALSE}
+stab_control(B = 1000)
+```
+
+The default choice of the similarity measure is the *Total variation distance* 
+(TVD) for classification problems and the *Euclidean distance* (ED) for 
+regression problems. It may be changed to other measures using
+```{r, eval=FALSE, prompt=FALSE}
+stab_control(measure = list(bdist, hdist))
+```
+A list of similarity measures implemented in the package can be found in the
+documentation (via `?similarity_measures`). However, user-defined similarity 
+functions are also accepted. For details, see the description in `?stability`.
+
+The default combination of sampling and evaluation methods is bootstrap
+sampling with out-of-bag evaluation. The methods can be changed by the
+`control` argument. For bootstrap sampling with in-sample or out-of-sample
+evaluation use one of
+
+```{r, eval=FALSE, prompt=FALSE}
+stab_control(evaluate = "ALL")
+stab_control(evaluate = "OOS")
+```
+
+For subsampling with out-of-bag, in-sample or out-of-sample evaluation use one
+of
+
+```{r, eval=FALSE, prompt=FALSE}
+stab_control(sampler = subsampling)
+stab_control(sampler = subsampling, evaluate = "ALL")
+stab_control(sampler = subsampling, evaluate = "OOS")
+```
+
+For splithalf sampling with in-sample or out-of-sample evaluation use one of
+
+```{r, eval=FALSE, prompt=FALSE}
+stab_control(sampler = splithalf, evaluate = "ALL")
+stab_control(sampler = splithalf, evaluate = "OOS")
+```
+
+More details on the available resampling and evaluation methods and all other
+options can be found via `?stab_control`.
+
+### Define new algorithms
+
+Algorithms that are not per default defined in the package **stablelearner**
+(see `?LearnerList` for a list of currently specified learners) can be easily 
+added to the library during a running R session as demonstrated below. To 
+investigate the stability of a result generated by the support vector machine 
+algorithm implemented in the package **e1071** the following steps are 
+necessary.
+
+First, load the package and generate a result by:
+
+```{r}
+library("e1071")
+res <- svm(Species ~ ., data = iris, probability = TRUE, gamma = 0.5, cost = 4)
+```
+
+Add the algorithm to `LearnerList` for the current R session by specifying the 
+class, the package name, the name of the method, the prediction function and 
+(optionally) an update function:
+
+```{r}
+newlearner <- list(
+  class   = "svm",
+  package = "e1071",
+  method  = "Support Vector Machine",
+  predfun = function(x, newdata, yclass = NULL) {
+    if(match(yclass, c("ordered", "factor"))) {
+      attr(predict(x, newdata = newdata, probability = TRUE), "probabilities")
+    } else {
+      predict(x, newdata = newdata)
+    }
+  },
+  updatefun = NULL)
+addLearner(newlearner)
+```
+
+The class of the fitted model object can be extracted using `class()`. In many 
+cases, the generic method `predict()` is defined for the class, but the 
+arguments tend to differ between implementations. For more information, the 
+documentation of the corresponding package should be considered. The update
+function is not required, if the call can be extracted using `getCall()`.
+
+Finally, the stability can be assessed as before using `stability()`. Note that 
+**stablelearner** currently only supports algorithms that use the common R 
+formula interface and the function `call` must be stored as part of the object 
+generated by the algorithm, since the refitting is done via `update()` (see 
+`?update`for details). Algorithms that do not provide the function call in the 
+returning object are currently not supported.
+
+### Stability assessment for a known DGP
+
+It is possible to assess the stability for a known data-generating process (DGP)
+given by a function that is passed to the `data` argument. The function must 
+return a an object of class `data.frame` containing the simulated observations.
+
+First, a DGP-function must be defined, for example, via the predefined 
+DGP-function for two-class problems available in the package.
+
+```{r}
+my_dgp <- function() dgp_twoclass(n = 100, p = 2, noise = 4, rho = 0.2)
+```
+
+Then, a first result must be generated by using the function and the algorithm
+of interest:
+
+```{r}
+res <- ctree(class ~ ., data = my_dgp())
+```
+
+Now, the result and the DGP-function are passed to the `stability()` function.
+
+```{r}
+stab_sim <- stability(res, data = my_dgp)
+summary(stab_sim)
+```

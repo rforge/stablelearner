@@ -6,7 +6,7 @@
 ## to refit the model with new data sets. Therefore, only learners that 
 ## store the call in their resulting object will work. Otherwise, a function 
 ## getCall must be provided for the that class. For details, see ?update.
-
+# 
 getLearner <- function(x) {
   LearnerList <- get("LearnerList", envir = .GlobalEnv)
   if(inherits(x, names(LearnerList))) {

@@ -12,8 +12,7 @@
 }
 
 \usage{
-  \method{boxplot}{stablelearnerList}(x, ..., main = NULL, xlab = "Learner",  
-    ylab = NULL, reverse = TRUE)
+  \method{boxplot}{stablelearnerList}(x, ..., main = NULL, xlab = NULL, ylab = NULL, reverse = TRUE)
   \method{boxplot}{stablelearner}(x, ...)
 }
 

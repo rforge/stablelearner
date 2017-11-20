@@ -1,7 +1,13 @@
-bootstrap <- function(B = 500) {
-  sampfun <- function(n) replicate(B, sample(1L:n, n, replace = TRUE))
-  list(method = "Bootstrap sampling", sampler = sampfun)
+bootstrap <- function(B = 500, v = 1) {
+  sampfun <- function(n) replicate(B, sample(1L:n, floor(v * n), replace = TRUE))
+  list(method = paste0("Bootstrap sampling with ", sprintf("%1.1f", 100 * v, 2), "% data"), 
+       sampler = sampfun)
 }
+
+# bootstrap <- function(B = 500) {
+#   sampfun <- function(n) replicate(B, sample(1L:n, n, replace = TRUE))
+#   list(method = "Bootstrap sampling", sampler = sampfun)
+# }
 
 subsampling <- function(B = 500, v = 0.8) {
   sampfun <- function(n) replicate(B, sample(1L:n, floor(v * n), replace = FALSE))

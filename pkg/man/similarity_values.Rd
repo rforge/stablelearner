@@ -29,9 +29,11 @@ measures.}
 \seealso{\code{\link{stability}}, \code{\link{summary.stablelearnerList}}}
 
 \examples{
+\dontrun{
 res <- ctree(Species ~ ., data = iris)
 stab <- stability(res)
 similarity_values(stab)
+}
 }
 
 \keyword{resampling, similarity}

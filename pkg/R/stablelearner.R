@@ -5,7 +5,7 @@
 stab_control <- function(B = 500, measure = list(tvdist, ccc),
                          sampler = "bootstrap", evaluate = "OOB", 
                          holdout = 0.25, seed = NULL, na.action = na.exclude, 
-                         ...) {
+                         savepred = TRUE, silent = TRUE, ...) {
   
   ## process evaluaton method
   if(!is.null(evaluate)) {
@@ -54,7 +54,9 @@ stab_control <- function(B = 500, measure = list(tvdist, ccc),
     measure = measure,
     na.action = na.action,
     holdout = holdout,
-    seed = seed
+    seed = seed,
+    savepred = savepred,
+    silent = silent
   )
   
   return(rval)
@@ -65,7 +67,7 @@ stability <- function(x, ..., data = NULL, control = stab_control(),
                       weights = NULL, applyfun = NULL, cores = NULL, 
                       names = NULL) {
   
-  x <- list(x, ...)
+  if (!inherits(x, "list")) x <- list(x, ...)
   
   ## no sampling when data argument is a function
   if(is.function(data))
@@ -79,17 +81,16 @@ stability <- function(x, ..., data = NULL, control = stab_control(),
   
   ## get learner infos
   nlearner <- length(x)
-  m <- lapply(x, getLearner)
+  m <- lapply(x, stablelearner::getLearner)
   
   rng <- RNGkind()
-
+  
   rval <- lapply(1L:nlearner, function(k) {
     ## process random number generator
     if(!is.null(control$seed))
       set.seed(control$seed, kind = "L'Ecuyer-CMRG")
     ## process stability computation
-    stability_internal(x = x[[k]], learner = m[[k]], 
-                       data = data, #dgpfun = dgpfun, 
+    stability_internal(x = x[[k]], learner = m[[k]], data = data, 
                        weights = weights, control = control, 
                        applyfun = applyfun, cores = cores)
   })
@@ -113,7 +114,11 @@ process_sampler <- function(n, sampler, evaluate, holdout, weights) {
   if(is.null(weights)|isTRUE(weights)) {
     allobs <- 1L:n
     if(sampler$method=="User-defined") {
-      stop("Currently not implemented. Please use weights argument!")
+      rout <- sampler$sampler(n = n)
+      ls1 <- rout[[1L]]
+      ls2 <- rout[[2L]]
+      es <- rout[[3L]]
+      # stop("Currently not implemented. Please use weights argument!")
     } else {
       if(evaluate=="OOS") {
         test <- sample(allobs, floor(holdout*n))
@@ -157,40 +162,125 @@ process_sampler <- function(n, sampler, evaluate, holdout, weights) {
 
 stability_internal <- function(x, learner, data, weights, control, 
                                applyfun, cores, ...) {
-
+  
   B        <- control$B
   measure  <- control$measure
   sampler  <- control$sampler
   evaluate <- control$evaluate
   holdout  <- control$holdout
   na.fun   <- control$na.action
+  savepred <- control$savepred
+  silent   <- control$silent
   
-  ## process call to receive response class
-  ## FIXME: probably not working for all learner in general
-  call <- getCall(x)
-  f <- formula(x)
-  resp <- f[[2]]
-  if(!is.name(resp)) stop("response is not a name")
-  yname <- as.character(resp)
-  mf <- call
-  mf <- mf[c(1L, match(c("formula", "data"), names(mf), 0L))]
-  mf[[1L]] <- as.name("model.frame")
-  mf[[2L]] <- f
-  mf <- eval(mf, parent.frame())
-  yclass <- class(mf[,yname])
+  prfun <- if(!is.null(learner$predict)) learner$predict else predict
+  upfun <- if(!is.null(learner$update)) learner$update else update
+  trfun <- if(!is.null(learner$terms)) learner$terms else terms
+  
+  ## extract information from call
+  call <- try(getCall(x), silent = TRUE)
+  if(inherits(call, "try-error")) {
+    # stop("Learner objects that do not provide the model call are not supported.")
+    sfit <- wfit <- dfit <- NULL
+  } else {
+    sfit <- call$subset
+    wfit <- call$weights
+    dfit <- call$data
+  }
+  
+  # ## process call to receive response class
+  # ## FIXME: probably not working for all learner in general
+  # call <- getCall(x)
+  # f <- formula(x)
+  # resp <- f[[2]]
+  # if(!is.name(resp)) stop("response is not a name")
+  # yname <- as.character(resp)
+  # mf <- call
+  # mf <- mf[c(1L, match(c("formula", "data"), names(mf), 0L))]
+  # mf[[1L]] <- as.name("model.frame")
+  # mf[[2L]] <- f
+  # mf <- eval(mf, parent.frame())
+  # yclass <- class(mf[,yname])
   
   ## check if weights are supported
-  wsup <- "weights" %in% formalArgs(as.character(call[[1L]]))
-  if(!is.null(weights)&!wsup) stop("Weights not supported by the learner! Please use sampler argument instead.")
+  # wsup <- "weights" %in% formalArgs(as.character(call[[1L]]))
+  # if(!is.null(weights)&!wsup) stop("Weights not supported by the learner! Please use sampler argument instead.")
+  
+  # call <- getCall(x)
+  # if (is.null(data)) data <- eval(call$data, parent.frame())  #FIXME# more elegant default?
+  # n <- nrow(data)
+  
+  ## get envoronment of x
+  env <- try(environment(trfun(x)), silent = TRUE)
+  if(inherits(env, "try-error")) env <- NULL
   
   ## data extraction and resampling
   if(!is.function(data)) {
-    call <- getCall(x)
-    if (is.null(data)) data <- eval(call$data, parent.frame())  #FIXME# more elegant default?
-    n <- nrow(data)
+    ## get data
+    if (is.null(data)) {
+      if (is.null(dfit)) {
+        ## there is no data object
+        data <- NULL
+      } else
+        ## get local copy of data object from where x was generated
+        data <- eval(dfit, envir = env, enclos = parent.frame())
+      if(!is.null(sfit)) {
+        sfit <- eval(sfit, envir = env, enclos = parent.frame())
+        data <- subset(data, subset = sfit)
+      }
+    }
+    
+    if(is.null(data)) {
+      stop("Could not extract the data from the model object. Please provide 
+           the data via the 'data' argument.")
+    }
+    
+    ## apply na.action
+    data <- na.fun(data)
+    
+    ## get sample size
+    n <- NROW(data)
+    
     samp <- process_sampler(n, sampler, evaluate, holdout, weights)
+    
+    ## are weights supported?
+    if(!inherits(call, "try-error")) {
+      fitfun <- get(as.character(call[[1L]]), mode = "function", 
+                    envir = asNamespace(learner$package))
+      wsup <- "weights" %in% formalArgs(fitfun)
+    } else wsup <- FALSE
+    
   }
-
+  
+  ## extract names and class of response variable via terms
+  yclass <- yname <- NULL
+  try({
+    tr <- trfun(x)
+    yi <- attr(tr, "response")
+    yclass <- attr(tr, "dataClasses")[yi]
+    yname <- names(yclass)
+  }, silent = TRUE)
+  
+  ## if the class could not be extracted from terms
+  if(inherits(yclass, "try-error") | is.null(yclass) | is.null(yname)) {
+    fmla <- eval(call$formula, envir = env, enclos = parent.frame())
+    yname <- all.vars(fmla)[1L]
+    yval <- if(is.function(data)) {
+      do.call("data", list(...))[,yname] 
+    } else { 
+      data[,yname] 
+    }
+    yclass <- class(yval)
+  }
+  
+  ## extract names and class of response variable
+  # fmla <- eval(call$formula, envir = env, enclos = parent.frame())
+  # mf <- model.frame(fmla, data = data)
+  # mf <- try(model.frame(tr, data = data))
+  # if(inherits(mf, "try-error")) stop("Could not extract terms from fitted model object.")
+  # yi     <- attr(tr, "response")
+  # yclass <- class(mf[,yi])
+  # yname  <- colnames(mf)[yi]
+  
   ## exclude measures that are not valid for the response class of the model
   measure <- lapply(measure, function(x) {
     if(yclass %in% x$classes) x else NULL
@@ -208,67 +298,101 @@ stability_internal <- function(x, learner, data, weights, control,
     }
   }
   
-  ## bootstrap trees (and omit data copy from tree)
-  xx <- applyfun(1L:B, function(b) {
-    if(!is.function(data)) {
-      if(is.null(weights)) {
-        ## generate subsamples
-        ls1 <- data[na.omit(samp$ls[,b,1L]), , drop = FALSE]
-        ls2 <- data[na.omit(samp$ls[,b,2L]), , drop = FALSE]
-        es  <- data[na.omit(samp$es[[b]]), , drop = FALSE]
+  ## generate function for repetitions
+  repeatfun <- function(b) {
+    
+    rval <- NULL
+    
+    try({
+      
+      if(!is.function(data)) {
+        if(is.null(weights)) {
+          ## generate subsamples
+          ls1 <- data[samp$ls[,b,1L], , drop = FALSE]
+          ls2 <- data[samp$ls[,b,2L], , drop = FALSE]
+          es  <- data[samp$es[[b]], , drop = FALSE]
+          ew  <- rep(1L, nrow(es))
+        } else {
+          ## extract weight
+          lw1 <- samp[,b,1L]
+          lw2 <- samp[,b,2L]
+          ew  <- samp[,b,3L]
+          es  <- data[ew>0L,]
+          ew  <- ew[ew>0L]
+        }
+      } else {
+        ls1 <- do.call("data", list(...))
+        ls2 <- do.call("data", list(...))
+        es  <- do.call("data", list(...))
         ew  <- rep(1L, nrow(es))
+      }
+      
+      if(nrow(es)>0L) {
+        
+        ## update results
+        if(is.null(weights)) {
+          x1 <- upfun(x, data = ls1)
+          x2 <- upfun(x, data = ls2)
+        } else {
+          x1 <- upfun(x, weights = lw1)
+          x2 <- upfun(x, weights = lw2)
+        }
+        
+        ## predict from both results
+        p1 <- prfun(x1, newdata = na.fun(es), yclass = yclass)
+        p2 <- prfun(x2, newdata = na.fun(es), yclass = yclass)
+        
+        ## make matrix
+        if(yclass %in% c("ordered", "factor") & NCOL(p1)<2) {
+          p1 <- cbind(1-p1, p1)
+          p2 <- cbind(1-p2, p2)
+          colnames(p1) <- levels(data[,yname])
+          colnames(p2) <- levels(data[,yname])
+        } else {
+          p1 <- as.matrix(p1)
+          p2 <- as.matrix(p2)
+        }
+        
+        ## correct order of factors in matrix
+        if(yclass %in% c("ordered", "factor")) {
+          c1 <- colnames(p1)
+          c2 <- colnames(p2)
+          if(!identical(c1, c2)) p2 <- p2[,c1]
+        }
+        
+        ## replicate according to weights
+        p1 <- p1[rep(1L:nrow(p1), times = ew), , drop = FALSE]
+        p2 <- p2[rep(1L:nrow(p2), times = ew), , drop = FALSE]
+        
+        sval <- sapply(measure, function(mfun) mfun$measure(p1, p2))
+        
+        rval <- list(stab = sval, 
+                     pred = if (savepred) {
+                       resp <- es[,yname]
+                       list(data.frame(y = resp, p1), data.frame(y = resp, p2))
+                     } else NA)
+        
+        ## clear memory
+        rm(x1, x2, p1, p2, ls1, ls2, es, ew)
+        invisible(gc(FALSE))
+
       } else {
-        ## extract weight
-        lw1 <- samp[,b,1L]
-        lw2 <- samp[,b,2L]
-        ew  <- samp[,b,3L]
-        es  <- data[ew>0L,]
-        ew  <- ew[ew>0L]
+        stop("Nothing to predict.")
       }
-    } else {
-      ls1 <- do.call("data", list(...))
-      ls2 <- do.call("data", list(...))
-      es  <- do.call("data", list(...))
-      ew  <- rep(1L, nrow(es))
-    }
-    if(nrow(es)>0L) {
-      ## update results
-      if(is.null(weights)) {
-        x1 <- update(x, data = ls1)
-        x2 <- update(x, data = ls2)
-      } else {
-        x1 <- update(x, weights = lw1)
-        x2 <- update(x, weights = lw2)
-      }
-      ## predict from both resuls
-      p1 <- learner$predfun(x1, newdata = es, yclass = yclass)
-      p2 <- learner$predfun(x2, newdata = es, yclass = yclass)
-      ## to matrix
-      p1 <- as.matrix(p1)
-      p2 <- as.matrix(p2)
-      ## replicate according to weights
-      p1 <- p1[rep(1L:nrow(p1), times = ew), , drop = FALSE]
-      p2 <- p2[rep(1L:nrow(p2), times = ew), , drop = FALSE]
-      ##
-      na1 <- apply(p1, 1, function(x) any(is.na(x)))
-      na2 <- apply(p2, 1, function(x) any(is.na(x)))
-      nas <- na1 | na2
-      if(sum(nas) > 0L) {
-        if(is.null(nrow(p1))) p1[nas,] <- NA else p1[nas,] <- NA
-        if(is.null(nrow(p2))) p2[nas,] <- NA else p2[nas,] <- NA
-        p1 <- na.fun(p1)
-        p2 <- na.fun(p2)
-      }
-      sval <- sapply(measure, function(mfun) mfun$measure(p1, p2))
-      rval <- sval
+
+    }, silent = silent)
+
+    if(is.null(rval))
+      return(list(stab = rep(NA, length(measure)), pred = NA))
+    else
       return(rval)
-    } else {
-      return(rep(NA, length(measure)))
-    }
-  })
+    
+  }
   
-  ## process similarities
-  sval <- simplify2array(xx)
+  ## process resampling and compute similarities
+  xx   <- applyfun(1L:B, repeatfun)
+  pval <- lapply(xx, function(x) if(is.null(x)) NA else x$pred)
+  sval <- sapply(xx, function(x) if(is.null(x)) NA else x$stab)
   sval <- if(is.vector(sval)) as.matrix(sval) else t(sval)
   colnames(sval) <- sapply(measure, function(x) x$name)
   
@@ -324,17 +448,68 @@ stability_internal <- function(x, learner, data, weights, control,
   }
   
   res <- list(
-    call = call,
+    call = if(inherits(call, "try-error")) NULL else call,
     learner = learner,
     B = B,
     sval = sval,
+    pred = pval,
     sampstat = sampstat,
-    data = call$data,
     control = control
   )
   class(res) <- "stablelearner"
   
   return(res)
+  
+}
+
+accuracy <- function(x, measure = "kappa", na.action = na.exclude, 
+                     applyfun = NULL, cores = NULL) {
+  
+  if(class(x) == "stablelearner") x <- list(x)
+  
+  ## facilitate parallelization
+  if (is.null(applyfun)) {
+    applyfun <- if (is.null(cores)) {
+      lapply
+    } else {
+      function(X, FUN) parallel::mclapply(X, FUN, mc.cores = cores)
+    }
+  }
+  
+  rval <- applyfun(x, function(m) {
+    rval <- sapply(m$pred, function(rep.outer) {
+      sapply(rep.outer, function(rep.inner) {
+        rep.inner <- na.action(rep.inner)
+        if(nrow(rep.inner)<1L) return(rep(NA, 4))
+        lev <- levels(rep.inner[,1])
+        cnm <- colnames(rep.inner)[-1L]
+        prd <- factor(cnm[apply(rep.inner[,-1], 1, which.max)], levels = lev)
+        tab <- table(rep.inner[,1], prd)
+        unlist(e1071::classAgreement(tab))
+      })
+    }, simplify = "array")
+    rval[measure,,]
+  })
+  
+  attr(rval, "measure") <- measure
+  
+  return(rval)
+  
+}
+
+tuner <- function(method, tunerange, ...) {
+  
+  m <- match.call(expand.dots = FALSE)
+  
+  range_df <- expand.grid(tunerange)
+  
+  rval <- lapply(1L:nrow(range_df), function(i) {
+    return(do.call(method, c(m$..., as.list(range_df[i, , drop = FALSE]))))
+  })
+  
+  attr(rval, "range") <- range_df
+  
+  return(rval)
   
 }
 
@@ -417,6 +592,8 @@ summary.stablelearnerList <- function(object, ..., reverse = TRUE,
   qtab <- array(qtab, dim = c(length(probs), dim(simv)[-1]))
   dimnames(qtab) <- c(list(sprintf("%i%%", probs*100)), dimnames(simv)[2:3])
   ans$qTable <- aperm(qtab, perm = c(2,1,3))
+  ans$missings <- sapply(object, function(x) max(colSums(is.na(x$sval))), simplify = "array")
+  names(ans$missings) <- names
   class(ans) <- "summary.stablelearnerList"
   ans
 }
@@ -446,6 +623,10 @@ print.summary.stablelearnerList <- function(x, ...)
   # cat(sprintf("%03.2f obs [%i, %i]\n", x$eo[1], x$eo[2], x$eo[3]))
   cat("\nSimilarity summary:\n\n")
   print(format(x$qTable, digits = x$digits), quote = FALSE)
+  if(any(x$missings>0L)) {
+    cat("Missing values (caused by errors in repetitions):\n\n")
+    print(x$missings)
+  }
 }
 
 print.stablelearner <- function(x, ...) {
@@ -476,7 +657,7 @@ boxplot.stablelearner <- function(x, ...) {
 }
 
 boxplot.stablelearnerList <- 
-  function(x, ..., main = NULL, xlab = "Learner",  ylab = NULL, 
+  function(x, ..., main = NULL, xlab = NULL,  ylab = NULL, 
            reverse = TRUE)
   {
     
@@ -535,7 +716,7 @@ dgp_twoclass <- function(n = 100, p = 4, noise = 16, rho = 0, b0 = 0,
   d <- p + noise
   S <- diag(d)
   S[1L:p,1L:p] <- rho^(toeplitz(1L:p)-1)
-  X <- mvrnorm(n, mu = rep(0, d), Sigma = S)
+  X <- MASS::mvrnorm(n, mu = rep(0, d), Sigma = S)
   colnames(X) <- paste0("x", 1L:d)
   xx <- fx(X[, 1L:p, drop = FALSE])
   pi <- plogis(b0 + xx %*% b)

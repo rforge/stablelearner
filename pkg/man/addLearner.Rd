@@ -23,7 +23,7 @@
   including the name of the learners object class, the name of the package 
   where the class and the fitting method is implemented, the name of the method 
   and a prediction function that predicts class probabilities (in the 
-  classification case) or numeric values (in the regressioncase ) and takes the 
+  classification case) or numeric values (in the regression case) and takes the 
   arguments \code{x} (the fitted model object), \code{newdata} a 
   \code{data.frame} containing the predictions of the observations in the
   evaluation sample and \code{yclass} a character string specifying the type
@@ -40,7 +40,7 @@ newlearner <- list(
   class   = "svm",
   package = "e1071",
   method  = "Support Vector Machine",
-  predfun = function(x, newdata, yclass = NULL) {
+  predict = function(x, newdata, yclass = NULL) {
     if(match(yclass, c("ordered", "factor"))) {
       attr(predict(x, newdata = newdata, probability = TRUE), "probabilities")
     } else {

@@ -13,7 +13,7 @@
 }
 
 \usage{
-  bootstrap(B = 500)
+  bootstrap(B = 500, v = 1)
   subsampling(B = 500, v = 0.8)
   samplesplitting(k = 5)
   jackknife(d = 1, maxrep = 5000)

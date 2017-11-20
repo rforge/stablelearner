@@ -1,5 +1,8 @@
 import("partykit", "graphics")
 
+importFrom("e1071", 
+           "classAgreement")
+
 importFrom("MASS", 
            "mvrnorm")
 
@@ -12,7 +15,7 @@ importFrom("methods",
 importFrom("stats", 
            "cor", "formula", "na.exclude", "plogis", "quantile", "rbinom", 
            "toeplitz", "var", "getCall", "model.frame", "na.omit", "terms", 
-           "update")
+           "update", "predict")
 
 importFrom("parallel", 
            "mclapply")
@@ -23,9 +26,12 @@ export(
   ".stabEnv",
   "stability",
   "stab_control",
+  "accuracy",
+  "tuner",
 
   ## adding new learners
   "addLearner",
+  "getLearner",
   "LearnerList",
 
   ## utiltiy functions
@@ -46,6 +52,8 @@ export(
   "splithalf"
 
 )
+
+S3method("getCall", "cforest")
 
 S3method("barplot", "stabletree")
 S3method("image", "stabletree")
