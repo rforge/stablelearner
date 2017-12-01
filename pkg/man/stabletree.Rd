@@ -18,7 +18,7 @@
 
 \usage{
   stabletree(x, data = NULL, sampler = bootstrap, weights = NULL,
-    applyfun = NULL, cores = NULL, \dots)
+    applyfun = NULL, cores = NULL, savetrees = FALSE, \dots)
 }
 
 \arguments{
@@ -38,6 +38,8 @@
     that support these).}
   \item{cores}{integer. The number of cores to use in multicore computations
     using \code{\link[parallel]{mclapply}} (see above).}
+  \item{savetrees}{logical. If \code{TRUE}, trees based on resampled data sets 
+    are returned.}
   \item{\dots}{further arguments passed to \code{sampler}.}
 }
 
@@ -69,7 +71,10 @@
   \item{br0}{FIXME better name?,}
   \item{vs}{FIXME better name?,}
   \item{br}{FIXME better name?,}
-  \item{classes}{character vector indicating the classes of all partitioning variables.}
+  \item{classes}{character vector indicating the classes of all
+    partitioning variables.}
+  \item{trees}{a list of tree objects of class
+    \code{"party"}, or \code{NULL}.}
 }
 
 \references{
