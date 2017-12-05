@@ -20,3 +20,5 @@ Imports: graphics, methods, MASS, e1071
 Suggests: utils, Formula, nnet, rpart, tree, rmarkdown, knitr
 License: GPL-2 | GPL-3
 VignetteBuilder: knitr
+Additional_repositories: https://cloud.r-project.org/web/packages/
+
