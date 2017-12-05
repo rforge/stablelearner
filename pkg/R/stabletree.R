@@ -263,7 +263,9 @@ stabletree <- function(x, data = NULL, sampler = bootstrap, weights = NULL,
     vs = vi_mat,
     br = add_levels(br),
     classes = x_classes,
-    trees = if(savetrees) xx else NULL
+    trees = if(savetrees) { 
+      xx 
+    } else NULL
   )
   class(rval) <- "stabletree"
   return(rval)
