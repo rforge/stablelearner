@@ -3,7 +3,7 @@
 .stabEnv <- new.env()
 
 stabletree <- function(x, data = NULL, sampler = bootstrap, weights = NULL, 
-  applyfun = NULL, cores = NULL, savetrees = FALSE, ...)
+  applyfun = NULL, cores = NULL, ...)
 {
   
   ## process sampler
@@ -262,10 +262,7 @@ stabletree <- function(x, data = NULL, sampler = bootstrap, weights = NULL,
     br0 = extract_splitinfo(x),
     vs = vi_mat,
     br = add_levels(br),
-    classes = x_classes,
-    trees = if(savetrees) { 
-      xx 
-    } else NULL
+    classes = x_classes
   )
   class(rval) <- "stabletree"
   return(rval)
