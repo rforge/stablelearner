@@ -95,6 +95,9 @@ Philipp, M., Zeileis, A., and Strobl, C. (2016).
 \seealso{\code{\link{plot.stabletree}}, \code{\link[partykit]{as.party}}}
 
 \examples{
+
+\dontrun{
+
 ## build a simple tree
 m <- ctree(Species ~ ., data = iris)
 plot(m)
@@ -115,6 +118,8 @@ image(s)
 
 ## graphical cutpoint analysis
 plot(s)
+}
+
 }
 
 \keyword{regression}

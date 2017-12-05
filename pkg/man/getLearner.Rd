@@ -24,8 +24,10 @@
 \seealso{\code{\link{LearnerList}}, \code{\link{addLearner}}}
 
 \examples{
+\dontrun{
 m <- ctree(Species ~ ., data = iris)
 getLearner(m)
+}
 }
 
 \keyword{stability, similarity, resampling}

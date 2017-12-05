@@ -107,6 +107,8 @@
 \seealso{\code{\link{stabletree}}}
 
 \examples{
+
+\dontrun{
 ## build a tree
 m <- ctree(Species ~ ., data = iris)
 plot(m)
@@ -148,6 +150,8 @@ plot(s, select = 3, type.labels = "levels")
 plot(s, select = 3, type.labels = "nodeids")
 plot(s, select = 3, type.labels = "breaks")
 plot(s, select = 3, type.labels = "none")
+}
+
 }
 
 \keyword{regression}

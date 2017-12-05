@@ -53,6 +53,9 @@
 \seealso{\code{\link{stability}}}
 
 \examples{
+
+\dontrun{
+
 set.seed(0)
 
 m1 <- ctree(Species ~ ., data = iris[sample(1:nrow(iris), replace = TRUE),])
@@ -88,6 +91,8 @@ m$measure(p1, p2)
 ## jenson-shannon divergence (base = exp(1))
 m <- jsdiv(base = exp(1))
 m$measure(p1, p2)
+
+}
 
 }
 

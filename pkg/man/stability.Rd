@@ -80,12 +80,12 @@
 
 \examples{
 
+\dontrun{
 ## assessing the stability of a single result
 r1 <- ctree(Species ~ ., data = iris)
 stab <- stability(r1)
 summary(stab)
 
-\dontrun{
 ## assessing the stability of several results
 library("rpart")
 r2 <- rpart(Species ~ ., data = iris)

@@ -71,6 +71,9 @@
 \seealso{\code{\link{stability}}}
 
 \examples{
+
+\dontrun{
+
 set.seed(0)
 
 airq <- subset(airquality, !is.na(Ozone))
@@ -123,6 +126,8 @@ m$measure(p1, p2)
 ## pearson correlation coefficient
 m <- pcc()
 m$measure(p1, p2)
+
+}
 
 }
 
