@@ -14,7 +14,6 @@
 \format{
 A data frame containing 2207 observations on 11 variables.
 \describe{
-  \item{name}{a character with the persons full name.}
   \item{gender}{a factor with levels \code{male} and \code{female}.} 
   \item{age}{a numeric value with the persons age on the day of the 
   sinking. The age of babies (under 12 months) is given as a fraction of one 

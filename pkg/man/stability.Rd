@@ -72,6 +72,12 @@
   \code{"stablelearner"}.
 }
 
+\references{
+Philipp M, Rusch T, Hornik K, Strobl C (2018). Measuring the
+  \dQuote{Stability of Results from Supervised Statistical Learning}. Journal of
+  Computational and Graphical Statistics. Forthcoming
+}
+
 \seealso{\code{\link{boxplot.stablelearnerList}}, \code{\link{summary.stablelearner}}}
 
 \examples{
