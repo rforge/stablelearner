@@ -1,8 +1,6 @@
 \name{tuner}
 \alias{tuner}
 
-\encoding{latin1}
-
 \title{Tuning Wrapper Function}
 
 \description{
@@ -38,14 +36,11 @@
   is attached to the resulting object as an attribute.
 }
 
-%\references{FIXME}
-
 \seealso{\code{\link{stability}}}
 
 \examples{
 
-\dontrun{
-
+\donttest{
 ## tuning cforest using different values of its tuning parameter mtry
 r <- tuner("cforest", tunerange = list(mtry = 1:4), formula = Species ~ ., data = iris)
 stability(r, control = stab_control(seed = 1234))

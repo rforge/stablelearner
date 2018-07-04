@@ -1,8 +1,6 @@
 \name{stab_control}
 \alias{stab_control}
 
-\encoding{latin1}
-
 \title{Control for Supervised Stability Assessments}
 
 \description{
@@ -98,8 +96,6 @@ will be set for each fitted model object before the learning samples are
 generated using \code{"L'Ecuyer-CMRG"} (see \code{\link{set.seed}}) which 
 guarantees identical learning samples for each stability assessment and, thus, 
 comparability of the stability assessments between the results.}
-
-%\references{FIXME}
 
 \seealso{\code{\link{stability}}}
 

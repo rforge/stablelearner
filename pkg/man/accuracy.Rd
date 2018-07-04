@@ -1,8 +1,6 @@
 \name{accuracy}
 \alias{accuracy}
 
-\encoding{latin1}
-
 \title{Prediction Accuracy from Stability Assessment Results}
 
 \description{
@@ -47,8 +45,6 @@
   A matrix of size \code{2*B} times length(\code{measure}) containing prediction
   accuracy values of the learners trained during the stability assessment procedure.
 }
-
-%\references{FIXME}
 
 \seealso{\code{\link{stability}}}
 

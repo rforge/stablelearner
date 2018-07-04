@@ -1,8 +1,6 @@
 \name{similarity_values}
 \alias{similarity_values}
 
-\encoding{latin1}
-
 \title{Extracting Similarity Values}
 
 \description{
@@ -29,7 +27,7 @@ measures.}
 \seealso{\code{\link{stability}}, \code{\link{summary.stablelearnerList}}}
 
 \examples{
-\dontrun{
+\donttest{
 res <- ctree(Species ~ ., data = iris)
 stab <- stability(res)
 similarity_values(stab)

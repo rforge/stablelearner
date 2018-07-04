@@ -3,8 +3,6 @@
 \alias{summary.stablelearnerList}
 \alias{print.summary.stablelearnerList}
 
-\encoding{latin1}
-
 \title{Summarize Results from Stability Assessment}
 
 \description{
@@ -36,7 +34,7 @@
 
 \examples{
 
-\dontrun{
+\donttest{
 rval <- ctree(Species ~ ., data = iris)
 stab <- stability(rval)
 

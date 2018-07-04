@@ -4,8 +4,6 @@
 \alias{summary.stabletree}
 \alias{print.summary.stabletree}
 
-\encoding{latin1}
-
 \title{Stability Assessment for Tree Learners}
 
 \description{
@@ -79,27 +77,20 @@ Hothorn T, Zeileis A (2015).
   partykit: A Modular Toolkit for Recursive Partytioning in R.
   \emph{Journal of Machine Learning Research}, \bold{16}, 3905--3909.
 
-%Philipp M, Zeileis A, Strobl C (2016).
-%  \dQuote{A Toolkit for Stability Assessment of Tree-Based Learners}.
-%  Working Paper 2016-11. Working Papers in Economics and Statistics,
-%  Research Platform Empirical and Experimental Economics, Universität Innsbruck.
-
-Philipp, M., Zeileis, A., and Strobl, C. (2016).
-  \dQuote{A toolkit for stability assessment of tree-based learners}. 
-  In A. Colubi, A. Blanco, and C. Gatu (Eds.), Proceedings of compstat 2016 --
-  22nd international conference on computational statistics (pp. 315--325). 
+Philipp M, Zeileis A, Strobl C (2016).
+  \dQuote{A Toolkit for Stability Assessment of Tree-Based Learners}. 
+  In A. Colubi, A. Blanco, and C. Gatu (Eds.), Proceedings of COMPSTAT 2016 --
+  22nd International Conference on Computational Statistics (pp. 315--325). 
   The International Statistical Institute/International Association for
-  Statistical Computing. Preprint available here: 
+  Statistical Computing. Preprint available at
   \url{http://EconPapers.RePEc.org/RePEc:inn:wpaper:2016-11}
-
 }
 
 \seealso{\code{\link{plot.stabletree}}, \code{\link[partykit]{as.party}}}
 
 \examples{
 
-\dontrun{
-
+\donttest{
 ## build a simple tree
 m <- ctree(Species ~ ., data = iris)
 plot(m)

@@ -1,9 +1,7 @@
 \name{getLearner}
 \alias{getLearner}
 
-\encoding{latin1}
-
-\title{Get learner details from \code{\link{LearnerList}}}
+\title{Get Learner Details from \code{\link{LearnerList}}}
 
 \description{
   Function to get information available about a specific learner in 
@@ -24,7 +22,7 @@
 \seealso{\code{\link{LearnerList}}, \code{\link{addLearner}}}
 
 \examples{
-\dontrun{
+\donttest{
 m <- ctree(Species ~ ., data = iris)
 getLearner(m)
 }

@@ -1,8 +1,6 @@
 \name{LearnerList}
 \alias{LearnerList}
 
-\encoding{latin1}
-
 \title{List of Predefined Learners for Assessing Stability}
 
 \description{

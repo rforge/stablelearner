@@ -3,8 +3,6 @@
 \alias{print.stablelearner}
 \alias{print.stablelearnerList}
 
-\encoding{latin1}
-
 \title{Stability Assessment for Results from Supervised Statistical Learning}
 
 \description{
@@ -74,13 +72,11 @@
   \code{"stablelearner"}.
 }
 
-%\references{FIXME}
-
 \seealso{\code{\link{boxplot.stablelearnerList}}, \code{\link{summary.stablelearner}}}
 
 \examples{
 
-\dontrun{
+\donttest{
 ## assessing the stability of a single result
 r1 <- ctree(Species ~ ., data = iris)
 stab <- stability(r1)

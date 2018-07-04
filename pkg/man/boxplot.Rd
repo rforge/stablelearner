@@ -2,8 +2,6 @@
 \alias{boxplot.stablelearner}
 \alias{boxplot.stablelearnerList}
 
-\encoding{latin1}
-
 \title{Illustrate Results from Stability Assessment}
 
 \description{

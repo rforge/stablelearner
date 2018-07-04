@@ -1,8 +1,6 @@
 \name{dgp_twoclass}
 \alias{dgp_twoclass}
 
-\encoding{latin1}
-
 \title{Data-Ggnerating Function for Two-Class Problem}
 
 \description{

@@ -1,9 +1,7 @@
 \name{addLearner}
 \alias{addLearner}
 
-\encoding{latin1}
-
-\title{Add learners to \code{\link{LearnerList}}}
+\title{Add Learners to \code{\link{LearnerList}}}
 
 \description{
   The function can be used to add new learner to \code{\link{LearnerList}} in the 
