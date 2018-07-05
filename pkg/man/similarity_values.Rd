@@ -28,6 +28,7 @@ measures.}
 
 \examples{
 \donttest{
+library("partykit")
 res <- ctree(Species ~ ., data = iris)
 stab <- stability(res)
 similarity_values(stab)

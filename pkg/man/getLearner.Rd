@@ -23,6 +23,7 @@
 
 \examples{
 \donttest{
+library("partykit")
 m <- ctree(Species ~ ., data = iris)
 getLearner(m)
 }

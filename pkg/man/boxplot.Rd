@@ -31,6 +31,8 @@
 
 \examples{
 \dontrun{
+library("partykit")
+library("rpart")
 r1 <- ctree(Species ~ ., data = iris)
 r2 <- rpart(Species ~ ., data = iris)
 stab <- stability(r1, r2, names = c("ctree", "rpart"))

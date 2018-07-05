@@ -110,6 +110,7 @@
 
 \dontrun{
 ## build a tree
+library("partykit")
 m <- ctree(Species ~ ., data = iris)
 plot(m)
 

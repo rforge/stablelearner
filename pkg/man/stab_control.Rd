@@ -102,6 +102,7 @@ comparability of the stability assessments between the results.}
 \examples{
 
 \dontrun{
+library("partykit")
 res <- ctree(Species ~ ., data = iris)
 
 ## less repetitions

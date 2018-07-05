@@ -84,6 +84,7 @@ Philipp M, Rusch T, Hornik K, Strobl C (2018). Measuring the
 
 \donttest{
 ## assessing the stability of a single result
+library("partykit")
 r1 <- ctree(Species ~ ., data = iris)
 stab <- stability(r1)
 summary(stab)

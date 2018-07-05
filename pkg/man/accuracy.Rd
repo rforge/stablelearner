@@ -51,6 +51,7 @@
 \examples{
 
 \dontrun{
+library("partykit")
 res <- ctree(Species ~ ., data = iris)
 accuracy(res)
 }

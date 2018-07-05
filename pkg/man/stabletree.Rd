@@ -92,6 +92,7 @@ Philipp M, Zeileis A, Strobl C (2016).
 
 \donttest{
 ## build a simple tree
+library("partykit")
 m <- ctree(Species ~ ., data = iris)
 plot(m)
 

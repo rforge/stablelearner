@@ -76,6 +76,8 @@
 
 set.seed(0)
 
+library("partykit")
+
 airq <- subset(airquality, !is.na(Ozone))
 m1 <- ctree(Ozone ~ ., data = airq[sample(1:nrow(airq), replace = TRUE),])
 m2 <- ctree(Ozone ~ ., data = airq[sample(1:nrow(airq), replace = TRUE),])
