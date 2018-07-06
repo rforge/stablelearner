@@ -101,7 +101,8 @@ comparability of the stability assessments between the results.}
 
 \examples{
 
-\dontrun{
+\donttest{
+
 library("partykit")
 res <- ctree(Species ~ ., data = iris)
 
@@ -123,6 +124,7 @@ stability(res, control = stab_control(sampler = subsampling, evaluate = "OOS"))
 ## change resampling strategy to splithalf
 stability(res, control = stab_control(sampler = splithalf, evaluate = "ALL"))
 stability(res, control = stab_control(sampler = splithalf, evaluate = "OOS"))
+
 }
 
 }

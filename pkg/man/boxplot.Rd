@@ -30,13 +30,17 @@
 \seealso{\code{\link{stability}}, \code{\link{summary.stablelearnerList}}}
 
 \examples{
-\dontrun{
+\donttest{
+
 library("partykit")
-library("rpart")
 r1 <- ctree(Species ~ ., data = iris)
+
+library("rpart")
 r2 <- rpart(Species ~ ., data = iris)
+
 stab <- stability(r1, r2, names = c("ctree", "rpart"))
 boxplot(stab)
+
 }
 }
 

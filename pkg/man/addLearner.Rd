@@ -47,6 +47,7 @@ newlearner <- list(
   })
 
 addLearner(newlearner)
+
 }
 
 \keyword{stability, similarity, resampling}

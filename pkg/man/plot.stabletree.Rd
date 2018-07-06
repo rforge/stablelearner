@@ -108,7 +108,8 @@
 
 \examples{
 
-\dontrun{
+\donttest{
+
 ## build a tree
 library("partykit")
 m <- ctree(Species ~ ., data = iris)
@@ -151,6 +152,7 @@ plot(s, select = 3, type.labels = "levels")
 plot(s, select = 3, type.labels = "nodeids")
 plot(s, select = 3, type.labels = "breaks")
 plot(s, select = 3, type.labels = "none")
+
 }
 
 }

@@ -72,7 +72,7 @@
 
 \examples{
 
-\dontrun{
+\donttest{
 
 set.seed(0)
 

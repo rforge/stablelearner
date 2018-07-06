@@ -62,6 +62,7 @@
 \seealso{\code{\link{stabletree}}, \code{\link{stability}}}
 
 \examples{
+
 set.seed(0)
 
 ## bootstrap sampler
@@ -83,6 +84,7 @@ s$sampler(10)
 ## splithaf
 s <- splithalf(3)
 s$sampler(10)
+
 }
 
 \keyword{regression}

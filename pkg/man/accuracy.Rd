@@ -50,10 +50,11 @@
 
 \examples{
 
-\dontrun{
+\donttest{
 library("partykit")
 res <- ctree(Species ~ ., data = iris)
-accuracy(res)
+stab <- stability(res)
+accuracy(stab)
 }
 
 }

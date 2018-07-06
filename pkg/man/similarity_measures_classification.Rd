@@ -54,12 +54,12 @@
 
 \examples{
 
-\dontrun{
+\donttest{
 
 set.seed(0)
 
+## build trees
 library("partykit")
-
 m1 <- ctree(Species ~ ., data = iris[sample(1:nrow(iris), replace = TRUE),])
 m2 <- ctree(Species ~ ., data = iris[sample(1:nrow(iris), replace = TRUE),])
 
