@@ -55,7 +55,9 @@
   standard methods to generic functions including \code{print}, \code{summary}
   for numerical summaries and \code{plot}, \code{barplot}, and \code{image}
   for graphical representations. See \code{\link{plot.stabletree}} for more
-  details.
+  details. In most methods, the argument \code{original} can be set to
+  \code{TRUE} or \code{FALSE}, turning highlighting of the original tree 
+  information on and off.
 }
 
 \value{
@@ -75,7 +77,7 @@
 \references{
 Hothorn T, Zeileis A (2015).
   partykit: A Modular Toolkit for Recursive Partytioning in R.
-  \emph{Journal of Machine Learning Research}, \bold{16}, 3905--3909.
+  \emph{Journal of Machine Learning Research}, \bold{16}(118), 3905--3909.
 
 Philipp M, Zeileis A, Strobl C (2016).
   \dQuote{A Toolkit for Stability Assessment of Tree-Based Learners}. 
@@ -86,7 +88,8 @@ Philipp M, Zeileis A, Strobl C (2016).
   \url{http://EconPapers.RePEc.org/RePEc:inn:wpaper:2016-11}
 }
 
-\seealso{\code{\link{plot.stabletree}}, \code{\link[partykit]{as.party}}}
+\seealso{\code{\link{plot.stabletree}}, \code{\link{as.stabletree}}, 
+  \code{\link[partykit]{as.party}}}
 
 \examples{
 
