@@ -15,13 +15,16 @@ importFrom("methods",
 importFrom("stats", 
            "cor", "formula", "na.exclude", "plogis", "quantile", "rbinom", 
            "toeplitz", "var", "getCall", "model.frame", "na.omit", "terms", 
-           "update", "predict")
+           "update", "predict", "as.formula", "terms.formula")
 
 importFrom("parallel", 
            "mclapply")
 
 importFrom("randomForest",
            "getTree")
+
+importFrom("ranger",
+           "treeInfo")
 
 importClassesFrom("party", "RandomForest")
 
@@ -80,6 +83,7 @@ S3method("boxplot", "stablelearnerList")
 
 S3method("as.stabletree", "randomForest")
 S3method("as.stabletree", "cforest")
+S3method("as.stabletree", "ranger")
 
 exportMethods(as.stabletree)
 

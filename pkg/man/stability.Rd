@@ -45,7 +45,7 @@
 }
 
 \details{
-  FIXME
+  FIXME:
 }
 
 \value{

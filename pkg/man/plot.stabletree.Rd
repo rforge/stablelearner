@@ -99,11 +99,16 @@
   \item{xlim, ylim}{The limits of the plot.}
   \item{xaxs, yaxs}{The style of axis interval calculation to be used (see 
     \code{\link{par}} for details).}
-  \item{col.tree, lty.tree}{FIXME}
+  \item{col.tree, lty.tree}{color and line type to indicate differences from
+    the original tree that was resampled.}
 }
 
 \details{
-  FIXME
+  \itemize{
+    \item{\code{plot} visualizes the variability of the cutpoints.}
+    \item{\code{barplot} visualizes the variable selection frequency.}
+    \item{\code{image} visualizes the combinations of variables selected.}
+  }
 }
 
 \seealso{\code{\link{stabletree}}}

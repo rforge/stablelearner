@@ -15,7 +15,7 @@
 }
 
 \usage{
-  stabletree(x, data = NULL, sampler = bootstrap, weights = NULL,
+  stabletree(x, data = NULL, sampler = subsampling, weights = NULL,
     applyfun = NULL, cores = NULL, savetrees = FALSE, \dots)
 }
 
@@ -26,7 +26,8 @@
   \item{data}{an optional \code{data.frame}. By default the learning data from \code{x}
     is used (if this can be inferred from the \code{\link[stats]{getCall}} of \code{x}.}
   \item{sampler}{a resampling (generating) function. Either this should be a function
-    of \code{n} that returns a matrix or a sampler generator like \code{\link{bootstrap}}.}
+    of \code{n} that returns a matrix or a sampler generator like
+    \code{\link{subsampling}}.}
   \item{weights}{an optional matrix of dimension n * B that can be used to 
     weight the observations from the original learning data when the trees 
     are refitted. If \code{weight = NULL}, the \code{sampler} will be used.}
@@ -62,14 +63,16 @@
 
 \value{
   \code{stabletree} returns an object of class \code{"stabletree"} which is a list with
-  the following components:
+    the following components:
   \item{call}{the call from the model object \code{x},}
   \item{B}{the number of resampled datasets,}
   \item{sampler}{the \code{sampler} function,}
-  \item{vs0}{FIXME better name?,} 
-  \item{br0}{FIXME better name?,}
-  \item{vs}{FIXME better name?,}
-  \item{br}{FIXME better name?,}
+  \item{vs0}{numeric vector of the variable selections of the original tree,} 
+  \item{br0}{list of the break points (list of \code{nodeids}, \code{levels}, and
+    \code{breaks}) for each variable of the original tree,}
+  \item{vs}{numeric matrix of the variable selections for each resampled dataset,}
+  \item{br}{list of the break points (only the \code{breaks} for each variable over all
+    resampled datasets,}
   \item{classes}{character vector indicating the classes of all partitioning variables,}
   \item{trees}{a list of tree objects of class \code{"party"}, or \code{NULL}.}
 }

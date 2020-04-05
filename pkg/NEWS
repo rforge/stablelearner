@@ -1,13 +1,14 @@
 Changes in Version 0.1-2
 
+  o changed default sampling method in stabletree from bootstrap to subsampling
+    with a fraction of 0.632
+
   o as.stabletree() coercion generic added which allows to coerce a
-    randomForest (randomForest package), RandomForest (party package) or
-    cforest (partykit package) to a stabletree object.
+    randomForest (randomForest package), RandomForest (party package), 
+    cforest (partykit package) or ranger (ranger package) to a
+    stabletree object.
 
-  o added "Bipolar2009" dataset of a case-control study on bipolar disorder
-    (see Ryan et al., 2006 and Strobl et al. 2009)
-
-  o added a vignette on the variable selection and cutpoint and partition
+  o added a vignette on the variable and cutpoint selection
     analysis of random forests.
 
 Changes in Version 0.1-1

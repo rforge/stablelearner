@@ -1,5 +1,4 @@
 %FIXME: is this the right way to document the S3 dispatch for RandomForest?
-
 \name{stabletree-coercion}
 \alias{stabletree-coercion}
 \alias{as.stabletree}
@@ -7,6 +6,7 @@
 \alias{as.stabletree.RandomForest}
 \alias{as.stabletree,RandomForest-method}
 \alias{as.stabletree.cforest}
+\alias{as.stabletree.ranger}
 
 \title{Coercion Functions}
 
@@ -20,11 +20,13 @@
   \method{as.stabletree}{randomForest}(x, applyfun = NULL, cores = NULL, \dots)
   \method{as.stabletree}{RandomForest}(x, applyfun = NULL, cores = NULL, \dots)
   \method{as.stabletree}{cforest}(x, applyfun = NULL, cores = NULL, savetrees = FALSE, \dots)
+  \method{as.stabletree}{ranger}(x, applyfun = NULL, cores = NULL, \dots)
 }
 
 \arguments{
   \item{x}{an object of class \code{\link[randomForest]{randomForest}},
-    \code{\link[party]{RandomForest-class}} or \code{\link[partykit]{cforest}}.}
+    \code{\link[party]{RandomForest-class}}, \code{\link[partykit]{cforest}},
+    or \code{\link[ranger]{ranger}}.}
   \item{applyfun}{a \code{\link[base]{lapply}}-like function. The default is to
     use \code{\link[base]{lapply}} unless \code{cores} is specified in which
     case \code{\link[parallel]{mclapply}} is used (for multicore computations on
@@ -37,17 +39,21 @@
 
 \details{
   Random forests fitted using \code{\link[randomForest]{randomForest}},
-  \code{\link[party]{cforest}} or \code{\link[partykit]{cforest}} are coerced to
-  \code{"stabletree"} objects.
+  \code{\link[party]{cforest}}, \code{\link[partykit]{cforest}} or
+  \code{\link[ranger]{ranger}} are coerced to \code{"stabletree"} objects.
 
-  Note that when plotting a \code{\link[randomForest]{randomForest}}, the gray
-  areas of levels of a nominal variable do not mimic exactly the same
-  behavior as for classical \code{"stabletree"} objects, due to
-  \code{\link[randomForest]{randomForest}} not storing any information whether
-  any individuals were left fulfilling the splitting criterion in the subsample.
+  Note that when plotting a \code{\link[randomForest]{randomForest}} or
+  \code{\link[ranger]{ranger}}, the gray areas of levels of a nominal variable
+  do not mimic exactly the same behavior as for classical \code{"stabletree"}
+  objects, due to \code{\link[randomForest]{randomForest}} and
+  \code{\link[ranger]{ranger}}, not storing any information whether any
+  individuals were left fulfilling the splitting criterion in the subsample.
   Therefore, gray areas only indicate that this level of this variable has
   already been used in a split before in such a way that it could not be used
   for any further splits.
+
+  For \code{\link[ranger]{ranger}}, interaction terms are (currently) not
+  supported.
 }
 
 \value{
@@ -56,10 +62,13 @@
   \item{call}{the call from the model object \code{x},}
   \item{B}{the number of trees of the random forest,}
   \item{sampler}{the random forest fitting function,}
-  \item{vs0}{FIXME better name?,} 
-  \item{br0}{FIXME better name?,}
-  \item{vs}{FIXME better name?,}
-  \item{br}{FIXME better name?,}
+  \item{vs0}{numeric vector of the variable selections of the original tree,
+    here always a vector of zeros because there is no original tree,} 
+  \item{br0}{always \code{NULL} (only included for consistency),}
+  \item{vs}{numeric matrix of the variable selections for each tree of the
+    random forest,}
+  \item{br}{list of the break points (only the \code{breaks} for each variable over all
+    trees of the random forest,}
   \item{classes}{character vector indicating the classes of all partitioning
     variables,}
   \item{trees}{a list of tree objects of class \code{"party"}, or \code{NULL}.}
@@ -109,6 +118,19 @@ summary(scf_partykit, original = FALSE)
 barplot(scf_partykit)
 image(scf_partykit)
 plot(scf_partykit)
+
+## build a random forest using ranger
+library(ranger)
+set.seed(4)
+rf_ranger <- ranger(Species ~ ., data = iris)
+
+## coerce to a stabletree
+srf_ranger <- as.stabletree(rf_ranger)
+print(srf_ranger)
+summary(srf_ranger, original = FALSE)
+barplot(srf_ranger)
+image(srf_ranger)
+plot(srf_ranger)
 }
 
 }
