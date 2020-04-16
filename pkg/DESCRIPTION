@@ -1,6 +1,6 @@
 Package: stablelearner
 Version: 0.1-2
-Date: 2020-04-05
+Date: 2020-04-16
 Title: Stability Assessment of Statistical Learning Methods
 Authors@R: c(person(given = "Michel",  family = "Philipp",     role = c("aut", "cre"), email = "michel.philipp.mp@gmail.com"),
              person(given = "Carolin", family = "Strobl",      role = "aut",           email = "Carolin.Strobl@psychologie.uzh.ch"),
