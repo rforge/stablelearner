@@ -112,4 +112,5 @@ stability(res, data = my_dgp)
 
 }
 
-\keyword{resampling, similarity}
+\keyword{resampling}
+\keyword{similarity}
