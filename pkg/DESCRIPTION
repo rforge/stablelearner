@@ -1,6 +1,6 @@
 Package: stablelearner
-Version: 0.1-2
-Date: 2020-04-16
+Version: 0.1-3
+Date: 2021-01-08
 Title: Stability Assessment of Statistical Learning Methods
 Authors@R: c(person(given = "Michel",  family = "Philipp",     role = c("aut", "cre"), email = "michel.philipp.mp@gmail.com"),
              person(given = "Carolin", family = "Strobl",      role = "aut",           email = "Carolin.Strobl@psychologie.uzh.ch"),
@@ -12,6 +12,7 @@ Description: Graphical and computational methods that can be used to assess the
   stability of results from supervised statistical learning.
 Depends: R (>= 3.0.0)
 Imports: graphics, methods, MASS, e1071, partykit, party, randomForest, ranger
-Suggests: utils, Formula, nnet, rpart, knitr, evtree
+Suggests: utils, Formula, nnet, rpart, evtree, knitr, rmarkdown
 VignetteBuilder: knitr
 License: GPL-2 | GPL-3
+Encoding: UTF-8
