@@ -8,7 +8,7 @@ vignette: >
   %\VignetteIndexEntry{Variable Selection and Cutpoint Analysis of Random Forests}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteKeywords{random forests, variable selection, cutpoint selection, partition}
-  %\VignetteDepends{stablelearner,partykit,party,randomForest}
+  %\VignetteDepends{stablelearner,partykit,party,randomForest,rchallenge}
   %\VignetteEncoding{UTF-8}
 ---
 

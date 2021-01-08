@@ -12,7 +12,7 @@ Description: Graphical and computational methods that can be used to assess the
   stability of results from supervised statistical learning.
 Depends: R (>= 3.0.0)
 Imports: graphics, methods, MASS, e1071, partykit, party, randomForest, ranger
-Suggests: utils, Formula, nnet, rpart, evtree, knitr, rmarkdown
+Suggests: utils, Formula, nnet, rpart, evtree, rchallenge, knitr, rmarkdown
 VignetteBuilder: knitr
 License: GPL-2 | GPL-3
 Encoding: UTF-8
